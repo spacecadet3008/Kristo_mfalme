@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <div class="container-fluid dashboard-content">
+        <div class="col-xl-12 col-lg-10 col-md-11 col-sm-12 col-xl-7 mx-auto">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="col-lg-12 mr-auto ml-auto alert bg-warning alert-dismissable pb-0 pt-0" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true" class="text-danger"><b>&times;</b></span>
+                        </button>
+                        <div class="row">
+                            <div class="mr-auto ml-auto">
+                            <p class="h5 mr-auto ml-auto p-2 text-light">
+                                 <b>
+                                    {% if message.tags ==  "alert-danger" %}
+                                        <i class="fa fa-exclamation-triangle mr-3 text-danger"></i> {{ message }}
+                                    {% else %}
+                                        <i class="fa fa-check"></i> {{ message }}
+                                    {% endif %}
+                                </b>
+                            </p>
+                        </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <div class="card">
+                <h5 class="card-header h5">Add Community Leaders</h5>
+                <div class="card-body">
+                    <form action="{% url 'create_shepherd' %}" method="post" class="mb-5" id="communityLeadersForm">
+                        {% csrf_token %}
+                        
+                        <!-- Community Selection -->
+                        <div class="form-group mb-4">
+                            <label for="community_name">Community Name</label>
+                            <input type="text" class="form-control" id="community_name" 
+                                   name="community_name" list="communities-list" required autofocus>
+                            <datalist id="communities-list">
+                                {% for community in communities %}
+                                    <option value="{{ community.name }}">
+                                {% endfor %}
+                            </datalist>
+                            <small class="form-text text-muted">Type to select existing community or enter new one</small>
+                        </div>
+
+                        <!-- Leaders Container -->
+                        <div id="leaders-container">
+                            <!-- First Leader -->
+                            <div class="leader-form mb-4 p-3 border rounded">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0">Leader #1</h6>
+                                    <button type="button" class="btn btn-danger btn-sm remove-leader" style="display: none;">
+                                        <i class="fa fa-times"></i> Remove
+                                    </button>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label>Full Name</label>
+                                    <input type="text" class="form-control" name="leaders_name[]" required>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label>Position</label>
+                                    <select class="form-control" name="leaders_position[]" required>
+                                        <option value="">Select Position</option>
+                                        <option value="CHAIR PERSON">Chair Person</option>
+                                        <option value="VICE CHAIR">Vice Chair</option>
+                                        <option value="SECRETARY">Secretary</option>
+                                        <option value="VICE SECRETARY">Vice Secretary</option>
+                                        <option value="ACCOUNTANT">Accountant</option>
+                                        <option value="CHAIRPERSON">Chairperson</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label>Description</label>
+                                    <textarea class="form-control" name="leaders_description[]" rows="2"></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Phone Number</label>
+                                    <input type="tel" class="form-control" name="leaders_phone[]" 
+                                           placeholder="+255XXXXXXXXX" required>
+                                    <small class="form-text text-muted">Format: +255XXXXXXXXX</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add More Leaders Button -->
+                        <div class="form-group mb-4">
+                            <button type="button" class="btn btn-primary btn-sm" id="add-leader">
+                                <i class="fa fa-plus"></i> Add Another Leader
+                            </button>
+                        </div>
+
+                        <button type="submit" class="btn btn-success mt-3 text-light shadow btn-sm">
+                            Add All Leaders
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const leadersContainer = document.getElementById('leaders-container');
+        const addLeaderButton = document.getElementById('add-leader');
+        let leaderCount = 1;
+
+        // Add new leader form
+        addLeaderButton.addEventListener('click', function() {
+            leaderCount++;
+            const newLeaderForm = document.createElement('div');
+            newLeaderForm.className = 'leader-form mb-4 p-3 border rounded';
+            newLeaderForm.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0">Leader #${leaderCount}</h6>
+                    <button type="button" class="btn btn-danger btn-sm remove-leader">
+                        <i class="fa fa-times"></i> Remove
+                    </button>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label>Full Name</label>
+                    <input type="text" class="form-control" name="leaders_name[]" required>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label>Position</label>
+                    <select class="form-control" name="leaders_position[]" required>
+                        <option value="">Select Position</option>
+                        <option value="CHAIR PERSON">Chair Person</option>
+                        <option value="VICE CHAIR">Vice Chair</option>
+                        <option value="SECRETARY">Secretary</option>
+                        <option value="VICE SECRETARY">Vice Secretary</option>
+                        <option value="ACCOUNTANT">Accountant</option>
+                        <option value="CHAIRPERSON">Chairperson</option>
+                    </select>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label>Description</label>
+                    <textarea class="form-control" name="leaders_description[]" rows="2"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" class="form-control" name="leaders_phone[]" 
+                           placeholder="+255XXXXXXXXX" required>
+                    <small class="form-text text-muted">Format: +255XXXXXXXXX</small>
+                </div>
+            `;
+
+            leadersContainer.appendChild(newLeaderForm);
+            
+            // Add remove functionality
+            const removeButton = newLeaderForm.querySelector('.remove-leader');
+            removeButton.addEventListener('click', function() {
+                leadersContainer.removeChild(newLeaderForm);
+                updateLeaderNumbers();
+            });
+        });
+
+        // Remove leader functionality for initial remove buttons
+        document.querySelectorAll('.remove-leader').forEach(button => {
+            button.addEventListener('click', function() {
+                const leaderForm = this.closest('.leader-form');
+                leadersContainer.removeChild(leaderForm);
+                updateLeaderNumbers();
+            });
+        });
+
+        // Update leader numbers for display
+        function updateLeaderNumbers() {
+            const leaderForms = document.querySelectorAll('.leader-form');
+            leaderForms.forEach((form, index) => {
+                const title = form.querySelector('h6');
+                title.textContent = `Leader #${index + 1}`;
+            });
+        }
+    });
+</script>
+
+<style>
+    .leader-form {
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+    .leader-form:hover {
+        background-color: #e9ecef;
+    }
+    .remove-leader {
+        transition: all 0.3s ease;
+    }
+</style>
+{% endblock %}

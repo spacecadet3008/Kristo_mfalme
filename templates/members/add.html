@@ -1,0 +1,557 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block internal_style %}
+
+    <style>
+        .container {
+            max-width: 960px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 20px;
+            text-align: center;
+            margin: 20px 0 20px;
+        }
+        h1 small {
+            display: block;
+            font-size: 15px;
+            padding-top: 8px;
+            color: gray;
+        }
+
+        .avatar-upload {
+            position: relative;
+            max-width: 205px;
+            margin: 30px auto;
+        }
+        .avatar-upload .avatar-edit {
+            position: absolute;
+            right: 12px;
+            z-index: 1;
+            top: 10px;
+        }
+        .avatar-upload .avatar-edit input {
+            display: none;
+        }
+        .avatar-upload .avatar-edit input + label {
+            display: inline-block;
+            width: 34px;
+            height: 34px;
+            margin-bottom: 0;
+            border-radius: 100%;
+            background: #FFFFFF;
+            border: 1px solid transparent;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+            cursor: pointer;
+            font-weight: normal;
+            transition: all .2s ease-in-out;
+        }
+        .avatar-upload .avatar-edit input + label:hover {
+            background: #f1f1f1;
+            border-color: #d6d6d6;
+        }
+        .avatar-upload .avatar-edit input + label:after {
+            content: "\f030";
+            font-family: 'FontAwesome';
+            color: #757575;
+            position: absolute;
+            top: 7px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            margin: auto;
+        }
+        .avatar-upload .avatar-preview {
+            width: 192px;
+            height: 192px;
+            position: relative;
+            border-radius: 100%;
+            border: 6px solid #F8F8F8;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+        }
+        .avatar-upload .avatar-preview > div {
+            width: 100%;
+            height: 100%;
+            border-radius: 100%;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        /* New styles for multiple member creation */
+        .member-form {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            background-color: #f9f9f9;
+            position: relative;
+        }
+        
+        .member-count {
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .remove-member {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .remove-member:hover {
+            background-color: #d32f2f;
+        }
+        
+        .add-member-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .plus-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .plus-btn:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+        
+        .submit-all-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+    </style>
+
+{% endblock internal_style %}
+
+{% block script %}
+    <script>
+        function readURL(input, previewId) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#' + previewId).css('background-image', 'url('+e.target.result +')');
+                    $('#' + previewId).hide();
+                    $('#' + previewId).fadeIn(650);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        // Initialize for the first form
+        $(document).ready(function() {
+            $(".picture-input").change(function() {
+                var previewId = $(this).data('preview');
+                readURL(this, previewId);
+            });
+        });
+        
+        // Function to add a new member form
+        function addMemberForm() {
+            var formCount = $('.member-form').length;
+            var newFormIndex = formCount + 1;
+            
+            var newForm = `
+                <div class="member-form" id="member-form-${newFormIndex}">
+                    <div class="member-count">${newFormIndex}</div>
+                    <div class="form-header">
+                        <h6>Member #${newFormIndex}</h6>
+                        <button type="button" class="remove-member" onclick="removeMemberForm(${newFormIndex})">Remove</button>
+                    </div>
+                    <div class="container">
+                        <h1>Upload Your Image
+                            <small>and preview</small>
+                        </h1>
+                        <div class="avatar-upload">
+                            <div class="avatar-edit">
+                                <input type='file' id="id_picture_${newFormIndex}" name="picture_${newFormIndex}" accept="image/*" class="picture-input" data-preview="imagePreview_${newFormIndex}" />
+                                <label for="id_picture_${newFormIndex}"></label>
+                            </div>
+                            <div class="avatar-preview">
+                                <div id="imagePreview_${newFormIndex}" style="background-image: url({% static 'assets/images/avatar01.png' %}); background-size: 120%;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row mb-3">
+                        <div class="col">
+                            <label for="id_name_${newFormIndex}">Member Name</label>
+                            <input type="text" class="form-control" id="id_name_${newFormIndex}" name="name_${newFormIndex}" required>
+                        </div>
+                        <div class="col">
+                            <label for="id_telephone_${newFormIndex}">Phone Number</label>
+                            <input type="text" name="telephone_${newFormIndex}" id="id_telephone_${newFormIndex}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_shepherd_${newFormIndex}">Community</label>
+                        <select name="shepherd_${newFormIndex}" id="id_shepherd_${newFormIndex}" class="form-control">
+                            <option value="">----------- Select a community --------------</option>
+                            {% for shepherd in shepherds %}
+                                <option value="{{ shepherd.pk }}">{{ shepherd.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_ministry_${newFormIndex}">Ministry</label>
+                        <select name="ministry_${newFormIndex}" id="id_ministry_${newFormIndex}" class="form-control">
+                            <option value="">------------- Select The Ministry</option>
+                            {% for ministry in ministries %}
+                                <option value="{{ ministry.pk }}">{{ ministry.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="col">
+                            <label for="id_location_${newFormIndex}">Location</label>
+                            <input type="text" name="location_${newFormIndex}" id="id_location_${newFormIndex}" class="form-control">
+                        </div>
+                        <div class="col">
+                            <label for="id_guardians_name_${newFormIndex}">Guardian's Name</label>
+                            <input type="text" id="id_guardians_name_${newFormIndex}" class="form-control" name="guardians_name_${newFormIndex}">
+                        </div>
+                    </div>
+                    <div class="form-row mt-3">
+                        <div class="col">
+                            <label for="id_fathers_name_${newFormIndex}">Father's Name</label>
+                            <input type="text" id="id_fathers_name_${newFormIndex}" class="form-control" name="fathers_name_${newFormIndex}">
+                        </div>
+                        <div class="col">
+                            <label for="id_mothers_name_${newFormIndex}">Mother's Name</label>
+                            <input type="text" id="id_mothers_name_${newFormIndex}" class="form-control" name="mothers_name_${newFormIndex}">
+                        </div>
+                        <div class="col">
+                            <label for="id_code_${newFormIndex}">Tithe code</label>
+                            <input type="text" id="id_code_${newFormIndex}" class="form-control" name="code_${newFormIndex}">
+                        </div>
+                    </div>
+                    <br>
+                    <hr>
+                    <div class="form-group mt-3">
+                        <label class="custom-control custom-checkbox custom-control-inline">
+                            <input type="checkbox" class="custom-control-input" id="id_new_believer_school_${newFormIndex}" name="new_believer_school_${newFormIndex}">
+                            <span class="custom-control-label mr-3">New Believer's School</span>
+                        </label>
+                        <label class="custom-control custom-checkbox custom-control-inline">
+                            <input type="checkbox" class="custom-control-input" id="id_pays_tithe_${newFormIndex}" name="pays_tithe_${newFormIndex}">
+                            <span class="custom-control-label mr-5">Pay's Tithe</span>
+                        </label>
+                        <label class="custom-control custom-checkbox custom-control-inline">
+                            <input type="checkbox" class="custom-control-input" id="id_working_${newFormIndex}" name="working_${newFormIndex}">
+                            <span class="custom-control-label mr-5">Working</span>
+                        </label>
+                        <label class="custom-control custom-checkbox custom-control-inline">
+                            <input type="checkbox" class="custom-control-input" id="id_schooling_${newFormIndex}" name="schooling_${newFormIndex}">
+                            <span class="custom-control-label">Schooling</span>
+                        </label>
+                    </div>
+                </div>
+            `;
+            
+            $('#member-forms-container').append(newForm);
+            
+            // Re-initialize file input for the new form
+            $(".picture-input").off('change');
+            $(".picture-input").change(function() {
+                var previewId = $(this).data('preview');
+                readURL(this, previewId);
+            });
+        }
+        
+        // Function to remove a member form
+        function removeMemberForm(formId) {
+            if ($('.member-form').length > 1) {
+                $('#member-form-' + formId).remove();
+                // Update member numbers
+                $('.member-form').each(function(index) {
+                    var newIndex = index + 1;
+                    $(this).find('.member-count').text(newIndex);
+                    $(this).find('.form-header h6').text('Member #' + newIndex);
+                });
+            } else {
+                alert("You need at least one member form!");
+            }
+        }
+        
+        // Function to submit all forms
+function submitAllForms() {
+    // Show loading state
+    $('.submit-all-btn').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Adding Members...');
+    
+    // Collect all form data
+    var formData = new FormData();
+    var memberCount = $('.member-form').length;
+    
+    // Add member count
+    formData.append('member_count', memberCount);
+    
+    // Collect data from each form
+    for (var i = 1; i <= memberCount; i++) {
+        var prefix = (i === 1) ? '' : '_' + i;
+        
+        // Get all input values
+        var pictureInput = $('#id_picture' + prefix)[0];
+        if (pictureInput && pictureInput.files[0]) {
+            formData.append('picture' + prefix, pictureInput.files[0]);
+        }
+        
+        formData.append('name' + prefix, $('#id_name' + prefix).val() || '');
+        formData.append('telephone' + prefix, $('#id_telephone' + prefix).val() || '');
+        formData.append('shepherd' + prefix, $('#id_shepherd' + prefix).val() || '');
+        formData.append('ministry' + prefix, $('#id_ministry' + prefix).val() || '');
+        formData.append('location' + prefix, $('#id_location' + prefix).val() || '');
+        formData.append('guardians_name' + prefix, $('#id_guardians_name' + prefix).val() || '');
+        formData.append('fathers_name' + prefix, $('#id_fathers_name' + prefix).val() || '');
+        formData.append('mothers_name' + prefix, $('#id_mothers_name' + prefix).val() || '');
+        formData.append('code' + prefix, $('#id_code' + prefix).val() || '');
+        formData.append('new_believer_school' + prefix, $('#id_new_believer_school' + prefix).is(':checked'));
+        formData.append('pays_tithe' + prefix, $('#id_pays_tithe' + prefix).is(':checked'));
+        formData.append('working' + prefix, $('#id_working' + prefix).is(':checked'));
+        formData.append('schooling' + prefix, $('#id_schooling' + prefix).is(':checked'));
+    }
+    
+    // Submit via AJAX
+    $.ajax({
+        url: "{% url 'create_member' %}",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        success: function(response) {
+            if (response.success) {
+                if (response.success_count === response.total_count) {
+                    // All members added successfully
+                    showAlert('success', `All ${response.success_count} members added successfully!`);
+                } else {
+                    // Some members failed
+                    showAlert('warning', `${response.success_count} out of ${response.total_count} members added successfully.`);
+                }
+                
+                // Clear forms after successful submission
+                setTimeout(function() {
+                    window.location.reload();
+                }, 2000);
+            } else {
+                showAlert('error', 'Error adding members. Please try again.');
+            }
+        },
+        error: function(xhr, status, error) {
+            showAlert('error', 'Error submitting forms: ' + error);
+        },
+        complete: function() {
+            // Re-enable button
+            $('.submit-all-btn').prop('disabled', false).html('Add All Members');
+        }
+    });
+}
+
+// Helper function to show alerts
+function showAlert(type, message) {
+    var alertClass = type === 'success' ? 'alert-success' : 
+                     type === 'warning' ? 'alert-warning' : 'alert-danger';
+    
+    var alertHtml = `
+        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    `;
+    
+    $('.card-body').prepend(alertHtml);
+}
+    </script>
+
+{% endblock script %}
+
+
+{% block content %}
+    <div class="dashboard-wrapper">
+        <div class="container-fluid dashboard-content">
+            <div class="row">
+                <div class="col-xs-12 col-lg-11 col-md-11 col-sm-12 col-xl-7 mx-auto">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="col-lg-12 mr-auto ml-auto alert bg-warning alert-dismissable pb-0 pt-0" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true" class="text-danger"><b>&times;</b></span>
+                                </button>
+                                <div class="row">
+                                    <div class="mr-auto ml-auto">
+                                    <p class="h5 mr-auto ml-auto p-2 text-light">
+                                         <b>
+                                            {% if message.tags ==  "alert-danger" %}
+                                                <i class="fa fa-exclamation-triangle mr-3 text-danger"></i> {{ message }}
+                                            {% else %}
+                                                <i class="fa fa-check"></i> {{ message }}
+                                            {% endif %}
+                                        </b>
+                                    </p>
+                                </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="card">
+                        <h5 class="card-header"><p class="h5">Add Members </p></h5>
+                        <div class="card-body">
+                            <div id="member-forms-container">
+                                <div class="member-form" id="member-form-1">
+                                    <div class="member-count">1</div>
+                                    <div class="form-header">
+                                        <h6>Member #1</h6>
+                                        <button type="button" class="remove-member" onclick="removeMemberForm(1)">Remove</button>
+                                    </div>
+                                    <div class="container">
+                                        <h1>Upload Your Image
+                                            <small>and preview</small>
+                                        </h1>
+                                        <div class="avatar-upload">
+                                            <div class="avatar-edit">
+                                                <input type='file' id="{{ form.picture.id_for_label }}" name="{{ form.picture.name }}" accept="image/*" class="picture-input" data-preview="imagePreview_1" />
+                                                <label for="{{ form.picture.id_for_label }}"></label>
+                                            </div>
+                                            <div class="avatar-preview">
+                                                <div id="imagePreview_1" style="background-image: url({% static 'assets/images/avatar01.png' %}); background-size: 120%;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row mb-3">
+                                        <div class="col">
+                                            <label for="{{ form.name.id_for_label }}">Member Name</label>
+                                            <input type="text" class="form-control" id="{{ form.name.id_for_label }}" name="{{ form.name.name }}" required>
+                                        </div>
+                                        <div class="col">
+                                            <label for="{{ form.telephone.id_for_label }}">Phone Number</label>
+                                            <input type="text" name="{{ form.telephone.name }}" id="{{ form.telephone.id_for_label }}" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="{{ form.shepherd.id_for_label }}">Community</label>
+                                        <select name="{{ form.shepherd.community_name }}" id="{{ form.shepherd.id_for_label }}" class="form-control">
+                                            <option value="">----------- Select a community --------------</option>
+                                            {% for shepherd in shepherds %}
+                                                <option value="{{ shepherd.pk }}">{{ shepherd.community_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="{{ form.ministry.id_for_label }}">Ministry</label>
+                                        <select name="{{ form.ministry.name }}" id="{{ form.ministry.id_for_label }}" class="form-control">
+                                            <option value="">------------- Select The Ministry</option>
+                                            {% for ministry in ministries %}
+                                                <option value="{{ ministry.pk }}">{{ ministry.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="col">
+                                            <label for="{{ form.location.id_for_label }}">Location</label>
+                                            <input type="text" name="{{ form.location.name }}" id="{{ form.location.id_for_label }}" class="form-control">
+                                        </div>
+                                        <div class="col">
+                                            <label for="{{ form.guardians_name.id_for_label }}">Guardian's Name</label>
+                                            <input type="text" id="{{ form.guardians_name.id_for_label }}" class="form-control" name="{{ form.guardians_name.name }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-row mt-3">
+                                        <div class="col">
+                                            <label for="{{ form.fathers_name.id_for_label }}">Father's Name</label>
+                                            <input type="text" id="{{ form.fathers_name.id_for_label }}" class="form-control" name="{{ form.fathers_name.name }}">
+                                        </div>
+                                        <div class="col">
+                                            <label for="{{ form.mothers_name.id_for_label }}">Mother's Name</label>
+                                            <input type="text" id="{{ form.mothers_name.id_for_label }}" class="form-control" name="{{ form.mothers_name.name }}">
+                                        </div>
+                                        <div class="col">
+                                            <label for="{{ form.code.id_for_label }}">Tithe code</label>
+                                            <input type="text" id="{{ form.code.id_for_label }}" class="form-control" name="{{ form.code.name }}" >
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <hr>
+                                    <div class="form-group mt-3">
+                                        <label class="custom-control custom-checkbox custom-control-inline">
+                                            <input type="checkbox" class="custom-control-input" id="{{ form.new_believer_school.id_for_label }}" name="{{ form.new_believer_school.name }}">
+                                            <span class="custom-control-label mr-3">New Believer's School</span>
+                                        </label>
+                                        <label class="custom-control custom-checkbox custom-control-inline">
+                                            <input type="checkbox" class="custom-control-input" id="{{ form.pays_tithe.id_for_label }}" name="{{ form.pays_tithe.name }}">
+                                            <span class="custom-control-label mr-5">Pay's Tithe</span>
+                                        </label>
+                                        <label class="custom-control custom-checkbox custom-control-inline">
+                                            <input type="checkbox" class="custom-control-input" id="{{ form.working.id_for_label }}" name="{{ form.working.name }}">
+                                            <span class="custom-control-label mr-5">Working</span>
+                                        </label>
+                                        <label class="custom-control custom-checkbox custom-control-inline">
+                                            <input type="checkbox" class="custom-control-input" id="{{ form.schooling.id_for_label }}" name="{{ form.schooling.name }}">
+                                            <span class="custom-control-label">Schooling</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="add-member-btn">
+                                <button type="button" class="plus-btn" onclick="addMemberForm()">+</button>
+                            </div>
+                            
+                            <button type="button" class="btn btn-success submit-all-btn text-light shadow" onclick="submitAllForms()">Add All Members</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

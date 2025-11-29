@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <div class="container-fluid dashboard-content">
+        <div class="col-xl-12 col-lg-10 col-md-11 col-sm-12 col-xl-7 mx-auto">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="col-lg-12 mr-auto ml-auto alert bg-warning alert-dismissable pb-0 pt-0" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true" class="text-danger"><b>&times;</b></span>
+                        </button>
+                        <div class="row">
+                            <div class="mr-auto ml-auto">
+                            <p class="h5 mr-auto ml-auto p-2 text-light">
+                                 <b>
+                                    {% if message.tags ==  "alert-danger" %}
+                                        <i class="fa fa-exclamation-triangle mr-3 text-danger"></i> {{ message }}
+                                    {% else %}
+                                        <i class="fa fa-check"></i> {{ message }}
+                                    {% endif %}
+                                </b>
+                            </p>
+                        </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="card">
+                <h5 class="card-header h5">Edit Community: {{ community.name }}</h5>
+                <div class="card-body">
+                    <form method="post" class="mb-5">
+                        {% csrf_token %}
+                        
+                        <!-- Community Name -->
+                        <div class="form-group mb-4">
+                            <label for="community_name">Community Name</label>
+                            <input type="text" class="form-control" id="community_name" 
+                                   name="community_name" value="{{ community.name }}" required>
+                        </div>
+
+                        <!-- Leaders List -->
+                        <h6 class="mb-3">Community Leaders</h6>
+                        <div id="leaders-container">
+                            {% for leader in leaders %}
+                            <div class="leader-form mb-4 p-3 border rounded">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0">Leader #{{ forloop.counter }}</h6>
+                                </div>
+                                
+                                <input type="hidden" name="leader_ids[]" value="{{ leader.id }}">
+                                
+                                <div class="form-group mb-3">
+                                    <label>Full Name</label>
+                                    <input type="text" class="form-control" name="leader_names[]" 
+                                           value="{{ leader.name }}" required>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label>Position</label>
+                                    <select class="form-control" name="leader_positions[]" required>
+                                        <option value="">Select Position</option>
+                                        <option value="CHAIR PERSON" {% if leader.leader == "CHAIR PERSON" %}selected{% endif %}>Chair Person</option>
+                                        <option value="VICE CHAIR" {% if leader.leader == "VICE CHAIR" %}selected{% endif %}>Vice Chair</option>
+                                        <option value="SECRETARY" {% if leader.leader == "SECRETARY" %}selected{% endif %}>Secretary</option>
+                                        <option value="VICE SECRETARY" {% if leader.leader == "VICE SECRETARY" %}selected{% endif %}>Vice Secretary</option>
+                                        <option value="ACCOUNTANT" {% if leader.leader == "ACCOUNTANT" %}selected{% endif %}>Accountant</option>
+                                        <option value="CHAIRPERSON" {% if leader.leader == "CHAIRPERSON" %}selected{% endif %}>Chairperson</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label>Description</label>
+                                    <textarea class="form-control" name="leader_descriptions[]" rows="2">{{ leader.description }}</textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Phone Number</label>
+                                    <input type="tel" class="form-control" name="leader_phones[]" 
+                                           value="{{ leader.phone }}" placeholder="+255XXXXXXXXX">
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'list_shepherds' %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-success">Update Community</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,674 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Church System</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}">
+    <link href="{% static 'assets/vendor/fonts/circular-std/style.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'assets/libs/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendor/fonts/fontawesome/css/fontawesome-all.css' %}">
+    <link href="{% static 'assets/personal/font-awesome-4.7.0/css/font-awesome.min.css' %}" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'assets/vendor/fonts/material-design-iconic-font/css/materialdesignicons.min.css' %}">
+    <style>
+            .mini-divider {
+                height: 1px;
+                background: rgba(255,255,255,0.2);
+                margin: 5px 15px;
+            }
+
+            /* Badge styles for counts */
+            .badge.float-right {
+                font-size: 10px;
+                margin-top: 2px;
+            }
+
+            /* Receipt-specific styles */
+            .receipt-printed {
+                background-color: rgba(40, 167, 69, 0.1) !important;
+            }
+
+            .receipt-pending {
+                background-color: rgba(255, 193, 7, 0.1) !important;
+            }
+        .nav-left-sidebar.sidebar-dark.bg-success {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+           
+        }
+        .finance-active {
+            background-color: rgba(255,255,255,0.1) !important;
+            border-left: 4px solid #f3b600;
+        }
+        .nav-link.finance-active {
+            color: #fff !important;
+            font-weight: bold;
+        }
+        .submenu .nav-link.finance-active {
+            background-color: rgba(255,255,255,0.05) !important;
+        }
+
+        /* Improved responsive styles */
+        @media (max-width: 991.98px) {
+            .nav-left-sidebar {
+                position: fixed;
+                top: 0;
+                left: -180px;
+                width: 180px;
+                height: 100vh;
+                z-index: 1001;
+                transition: left 0.3s ease;
+                overflow-y: auto;
+            }
+            
+            .nav-left-sidebar.show {
+                left: 0;
+            }
+            
+            .dashboard-main-wrapper {
+                margin-left: 0 !important;
+            }
+            
+            /* Overlay when sidebar is open */
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 1000;
+            }
+            
+            .sidebar-overlay.show {
+                display: block;
+            }
+
+            .dashboard-header {
+                position: relative;
+                z-index: 1002;
+            }
+        }
+
+        /* Ensure proper sidebar behavior on desktop */
+        @media (min-width: 992px) {
+            .nav-left-sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                overflow-y: auto;
+                z-index: 100;
+            }
+            
+            .dashboard-main-wrapper {
+                margin-left: 0px;
+            }
+
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
+
+        /* Improve submenu animations */
+        .submenu {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link {
+            transition: all 0.2s ease;
+        }
+        
+        /* Active state improvements */
+        .nav-link.active {
+            background-color: rgba(255,255,255,0.1) !important;
+            border-left: 4px solid #f3b600;
+            color: #fff !important;
+            font-weight: bold;
+        }
+
+        /* Better mobile header */
+        .navbar-toggler {
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+
+    </style>
+    {% block internal_style %}{% endblock internal_style %}
+</head>
+
+<body>
+    {% block main_content %}
+    <!-- ============================================================== -->
+    <!-- main wrapper -->
+    <!-- ============================================================== -->
+        <div class="dashboard-main-wrapper">
+             <!-- ============================================================== -->
+            <!-- navbar -->
+            <!-- ============================================================== -->
+             <div class="dashboard-header">
+                <nav class="navbar navbar-expand-lg bg-dark fixed-top">
+                    <a class="navbar-brand" href="{% url 'home' %}"  style="color: white; font-size:12px; font-family:Times new roman; ">CHRIST THE KING (KRISTO MFALME)</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ml-auto navbar-right-top">
+                            <li class="nav-item">
+                                <div id="custom-search" class="top-search-bar">
+                                    <input class="form-control" type="text" placeholder="Search..">
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown notification">
+                                <a class="nav-link nav-icons" href="#" id="navbarDropdownMenuLink1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-fw fa-bell text-white"></i> <span class="indicator"></span></a>
+                                <ul class="dropdown-menu dropdown-menu-right notification-dropdown">
+                                    <li>
+                                        <div class="notification-title"> Notification</div>
+                                        <div class="notification-list">
+                                            <div class="list-group">
+                                                <a href="#" class="list-group-item list-group-item-action active">
+                                                    <div class="notification-info">
+                                                        <div class="notification-list-user-img"><img src="{% static 'assets/images/avatar-2.jpg' %}" alt="" class="user-avatar-md rounded-circle"></div>
+                                                        <div class="notification-list-user-block"><span class="notification-list-user-name">Finance Alert</span>Tithe report ready for review
+                                                            <div class="notification-date">10 min ago</div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                                <a href="#" class="list-group-item list-group-item-action">
+                                                    <div class="notification-info">
+                                                        <div class="notification-list-user-img"><img src="{% static 'assets/images/avatar-3.jpg' %}" alt="" class="user-avatar-md rounded-circle"></div>
+                                                        <div class="notification-list-user-block"><span class="notification-list-user-name">Budget Update</span>Monthly budget 80% utilized
+                                                            <div class="notification-date">3 days ago</div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                                <a href="{% url 'tithepayment:tithepayment_list' %}" class="list-group-item list-group-item-action">
+                                                    <div class="notification-info">
+                                                        <div class="notification-list-user-img"><img src="{% static 'assets/images/avatar-4.jpg' %}" alt="" class="user-avatar-md rounded-circle"></div>
+                                                        <div class="notification-list-user-block"><span class="notification-list-user-name">New Tithe</span>5 new tithe payments today
+                                                            <div class="notification-date">5 min ago</div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="list-footer"> <a href="{% url 'tithepayment:tithepayment_list' %}">View all notifications</a></div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown connection">
+                                <a class="nav-link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="fas fa-fw fa-th text-white"></i> </a>
+                                <ul class="dropdown-menu dropdown-menu-right connection-dropdown">
+                                    <li class="connection-list">
+                                        <div class="row">
+                                            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12 ">
+                                                <a href="{% url 'tithepayment:tithepayment_list' %}" class="connection-item"><i class="fas fa-2x fa-money-bill-wave"></i> <span>Tithe</span></a>
+                                            </div>
+                                            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12 ">
+                                                <a href="{% url 'list_ministries' %}" class="connection-item"><i class="fa fa-2x fa-building"></i> <span>Ministries</span></a>
+                                            </div>
+                                            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12 ">
+                                                <a href="{% url 'list_shepherds' %}" class="connection-item"><i class="fas fa-2x fa-people-carry"></i> <span>Shepherds</span></a>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-2">
+                                            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12 ">
+                                                <a href="{% url 'table_members' %}" class="connection-item"><i class="fa fa-2x fa-users"></i> <span>Members</span></a>
+                                            </div>
+                                            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12 ">
+                                                <a href="{% url 'tithepayment:tithepayment_create' %}" class="connection-item"><i class="fas fa-2x fa-plus-circle"></i> <span>Add Tithe</span></a>
+                                            </div>
+                                            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12 ">
+                                                <a href="{% url 'tithepayment:tithepayment_summary' %}" class="connection-item"><i class="fas fa-2x fa-chart-bar"></i> <span>Reports</span></a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="conntection-footer"><a href="{% url 'tithepayment:tithepayment_list' %}">More Finance</a></div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown nav-user">
+                                <a class="nav-link nav-user-img" href="#" id="navbarDropdownMenuLink2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="{% if not profile  %}{% static 'assets/images/avatar01.png' %}{% else %}{{ profile.picture.url }}{% endif %}" alt="" class="user-avatar-md rounded-circle"></a>
+                                <div class="dropdown-menu dropdown-menu-right nav-user-dropdown" aria-labelledby="navbarDropdownMenuLink2">
+                                    <div class="nav-user-info bg-success">
+                                        <span class="status"></span><span class="ml-2">Welcome</span>
+                                        <h5 class="mb-0 text-white nav-user-name">{{ user | capfirst }}</h5>
+                                        
+                                    </div>
+                                    <a class="dropdown-item" href="{% url 'user_profile' %}"><i class="fas fa-user mr-2 text-white"></i>Account</a>
+                                    {% if user.is_superuser %}
+                                        <a class="dropdown-item" href="{% url 'admin:index' %}"><i class="fas fa-cog mr-2"></i>Admin Panel</a>
+                                    {% endif %}
+                                    <a class="dropdown-item" href="{% url "_logout" %}" data-toggle="modal" data-target="#logoutModal"><i class="fas fa-power-off mr-2"></i>Logout</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+            <!-- ============================================================== -->
+            <!-- end navbar -->
+            <!-- ============================================================== -->
+            <!-- ============================================================== -->
+            <!-- left sidebar -->
+            <!-- ============================================================== -->
+            
+            <!-- Overlay for mobile sidebar -->
+            <div class="sidebar-overlay"></div>
+            
+            <div class="nav-left-sidebar sidebar-dark bg-success">
+                <div class="menu-list">
+                    <nav class="navbar navbar-expand-lg navbar-light">
+                        <a class="d-xl-none d-lg-none text-white font-weight-bold" href="{% url 'home' %}">Christ The King</a>
+                        <button class="navbar-toggler sidebar-toggler" type="button">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarNav">
+                            <ul class="navbar-nav flex-column">
+                                <li class="nav-divider text-white">
+                                    Menu
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{% url 'home' %}" class="nav-link {{ home_active }}">
+                                        <i class="fa fa-home"></i>Home
+                                    </a>
+                                </li>
+                                <li class="nav-item ">
+                                    <a class="nav-link {{ ministries_active_add }}{{ ministries_active_list }}" href="#" data-toggle="collapse" aria-expanded="false" data-target="#submenu-1" aria-controls="submenu-1">
+                                        <i class="fa fa-fw fa-building"></i>Ministries <span class="badge badge-success">6</span>
+                                    </a>
+                                    <div id="submenu-1" class="collapse submenu" style="">
+                                        <ul class="nav flex-column">
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ ministries_active_add }}" href="{% url 'add_ministry' %}">
+                                                    <i class="fa fa-plus"></i>Add
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ ministries_active_list }}" href="{% url 'list_ministries' %}">
+                                                    <i class="fa fa-list"></i>List
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link {{ shepherds_active_add }}{{ shepherds_active_list }}" data-toggle="collapse" aria-expanded="false" data-target="#shepherd-submenu" aria-controls="shepherd-submenu">
+                                        <i class="fas fa-people-carry"></i>Communities
+                                    </a>
+                                    <div id="shepherd-submenu" class="collapse submenu">
+                                        <ul class="nav flex-column">
+                                            <li class="nav-item">
+                                                <a href="{% url 'add_shepherd' %}" class="nav-link {{ shepherds_active_add }}">
+                                                    <i class="fa fa-plus"></i> Add
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="{% url 'list_shepherds' %}" class="nav-link {{ shepherds_active_list }}">
+                                                    <i class="fa fa-list"></i> List
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li class="nav-divider text-white">
+                                    Features
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link {{ members_active_list }}{{ members_active_add }}" data-toggle="collapse" aria-expanded="false" data-target="#members-submenu" aria-controls="members-submenu">
+                                        <i class="fas fa-users"></i>Members
+                                    </a>
+                                    <div id="members-submenu" class="collapse submenu">
+                                        <ul class="nav flex-column">
+                                            <li class="nav-item">
+                                                <a href="{% url 'add_member' %}" class="nav-link {{ members_active_add }}">
+                                                    <i class="fa fa-plus"></i> Add
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="{% url 'table_members' %}" class="nav-link {{ members_active_list }}">
+                                                    <i class="fa fa-list"></i> List
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                
+                                <!-- Finance/Tithe Section -->
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link {% if finance_active or tithepayment_active_list or tithepayment_active_create or tithepayment_active_summary or receipts_active %}finance-active{% endif %}" 
+                                    data-toggle="collapse" aria-expanded="{% if finance_active or tithepayment_active_list or tithepayment_active_create or tithepayment_active_summary or receipts_active %}true{% else %}false{% endif %}" 
+                                    data-target="#finance-submenu" aria-controls="finance-submenu">
+                                        <i class="fas fa-money-bill-wave"></i>Finance & Tithe
+                                    </a>
+                                    <div id="finance-submenu" class="collapse submenu {% if finance_active or tithepayment_active_list or tithepayment_active_create or tithepayment_active_summary or receipts_active %}show{% endif %}">
+                                        <ul class="nav flex-column">
+                                            <!-- Tithe Payments -->
+                                            <li class="nav-item">
+                                                <a href="{% url 'tithepayment:tithepayment_list' %}" 
+                                                class="nav-link {% if tithepayment_active_list %}finance-active{% endif %}">
+                                                    <i class="fas fa-list"></i> All Tithe Payments
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="{% url 'tithepayment:tithepayment_create' %}" 
+                                                class="nav-link {% if tithepayment_active_create %}finance-active{% endif %}">
+                                                    <i class="fas fa-plus-circle"></i> Record Tithe
+                                                </a>
+                                            </li>
+                                            
+                                            <!-- Receipts Section - Using YOUR existing URLs -->
+                                            <li class="nav-divider mini-divider mt-2 mb-1"></li>
+                                            <li class="nav-item">
+                                                <a href="{% url 'tithepayment:receipt_list' %}" 
+                                                class="nav-link {% if receipts_active %}finance-active{% endif %}">
+                                                    <i class="fas fa-receipt"></i> All Receipts
+                                                    <span class="badge badge-warning float-right" id="unprinted-count">0</span>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="{% url 'tithepayment:receipt_list' %}" 
+                                                class="nav-link">
+                                                    <i class="fas fa-print"></i> Unprinted Receipts
+                                                    <span class="badge badge-danger float-right" id="pending-print-count">0</span>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="{% url 'tithepayment:tithepayment_list' %}" 
+                                                class="nav-link">
+                                                    <i class="fas fa-sync"></i> Generate Missing Receipts
+                                                </a>
+                                            </li>
+                                            
+                                            <!-- Reports -->
+                                            <li class="nav-divider mini-divider mt-2 mb-1"></li>
+                                            <li class="nav-item">
+                                                <a href="{% url 'tithepayment:tithepayment_summary' %}" 
+                                                class="nav-link {% if tithepayment_active_summary %}finance-active{% endif %}">
+                                                    <i class="fas fa-chart-bar"></i> Tithe Reports
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="{% url 'tithepayment:monthly_report' %}" 
+                                                class="nav-link {% if tithepayment_active_monthly %}finance-active{% endif %}">
+                                                    <i class="fas fa-calendar-alt"></i> Monthly Reports
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="{% url 'tithepayment:export_tithe_payments' %}" 
+                                                class="nav-link {% if tithepayment_active_export %}finance-active{% endif %}">
+                                                    <i class="fas fa-download"></i> Export Data
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link" data-toggle="collapse" aria-expanded="false" data-target="#information" aria-controls="information">
+                                        <i class="fa fa-info"></i>Information Center
+                                    </a>
+                                    <div class="collapse submenu" id="information">
+                                        <ul class="nav flex-column">
+                                            <a href="#" class="nav-link">Notice (SMS)</a>
+                                            <a href="#" class="nav-link">Reminders</a>
+                                            <a href="#" class="nav-link">Announcements</a>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <!-- Quick Actions -->
+                                <li class="nav-divider text-white">
+                                    Quick Actions
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{% url 'tithepayment:tithepayment_create' %}" class="nav-link text-warning {% if tithepayment_active_create %}finance-active{% endif %}">
+                                        <i class="fas fa-plus-circle"></i> Quick Tithe Entry
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{% url 'tithepayment:receipt_list' %}" class="nav-link text-info {% if receipts_active %}finance-active{% endif %}">
+                                        <i class="fas fa-receipt"></i> Today's Receipts
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{% url 'tithepayment:receipt_list' %}" class="nav-link text-danger">
+                                        <i class="fas fa-print"></i> Print Pending Receipts
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+            <!-- ============================================================== -->
+            <!-- end left sidebar -->
+            <!-- ============================================================== -->
+            <!-- ============================================================== -->
+            <!-- wrapper  -->
+            <!-- ============================================================== -->
+
+            {% block content %}
+            <!-- Main content will be inserted here -->
+            {% endblock content %}
+
+            <!-- ============================================================== -->
+            <!-- footer -->
+            <!-- ============================================================== -->
+            {% block footer %}
+                <div class="footer">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <p class="float-left">Copyright © 2025 <b class="text-warning">Christ The King Church</b>. All Rights Reserved.</p>
+                                <div class="footer-links d-none d-sm-block float-right">
+                                    <a href="{% url 'tithepayment:tithepayment_list' %}">Finance</a>
+                                    <a href="{% url 'admin:index' %}">Admin</a>
+                                    <a href="javascript: void(0);">Support</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endblock footer %}
+        </div>
+        <!-- ============================================================== -->
+        <!-- end main wrapper -->
+        </div>
+        <!-- ============================================================== -->
+    {% endblock main_content %}
+
+    <!-- Logout Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="logoutModallabel">Ready to Leave?</h5>
+              <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+              <a class="btn btn-primary" href="{% url '_logout' %}">Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <!-- JavaScript Files -->
+    <script src="{% static 'assets/vendor/jquery/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.js' %}"></script>
+    <script src="{% static 'assets/vendor/slimscroll/jquery.slimscroll.js' %}"></script>
+    <script src="{% static 'assets/libs/js/main-js.js' %}"></script>
+    
+    <!-- Custom Script to Fix Sidebar Issues -->
+    <script>
+    $(document).ready(function() {
+        // Initialize all tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+        
+        // Handle sidebar collapse/expand state persistence
+        $('.nav-link[data-toggle="collapse"]').on('click', function(e) {
+            e.preventDefault();
+            var target = $(this).data('target');
+            var isExpanded = $(this).attr('aria-expanded') === 'true';
+            
+            if (!isExpanded) {
+                // Close other open submenus
+                $('.submenu').not(target).collapse('hide');
+                $('.nav-link[data-toggle="collapse"]').not(this).attr('aria-expanded', 'false');
+            }
+            
+            // Toggle the current submenu
+            $(target).collapse('toggle');
+            $(this).attr('aria-expanded', !isExpanded);
+        });
+
+        // Mobile sidebar toggle
+        $('.sidebar-toggler').on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $('.nav-left-sidebar').toggleClass('show');
+            $('.sidebar-overlay').toggleClass('show');
+        });
+
+        // Close sidebar when clicking on overlay
+        $('.sidebar-overlay').on('click', function() {
+            $('.nav-left-sidebar').removeClass('show');
+            $('.sidebar-overlay').removeClass('show');
+        });
+
+        // Close sidebar when clicking on a link (mobile view)
+        $(document).on('click', function(e) {
+            if ($(window).width() < 992) {
+                if (!$(e.target).closest('.nav-left-sidebar').length && 
+                    !$(e.target).closest('.sidebar-toggler').length &&
+                    $('.nav-left-sidebar').hasClass('show')) {
+                    $('.nav-left-sidebar').removeClass('show');
+                    $('.sidebar-overlay').removeClass('show');
+                }
+            }
+        });
+
+        // Close mobile sidebar when clicking on a nav link
+        if ($(window).width() < 992) {
+            $('.nav-left-sidebar .nav-link').on('click', function() {
+                $('.nav-left-sidebar').removeClass('show');
+                $('.sidebar-overlay').removeClass('show');
+            });
+        }
+
+        // Handle page refresh - maintain active states
+        function setActiveMenu() {
+            var currentUrl = window.location.href;
+            
+            // Remove all active classes first
+            $('.nav-link').removeClass('active finance-active');
+            
+            // Add active class to current page link
+            $('.nav-link').each(function() {
+                var linkUrl = $(this).attr('href');
+                if (linkUrl && linkUrl !== '#' && currentUrl.indexOf(linkUrl) !== -1) {
+                    $(this).addClass('active');
+                    
+                    // If it's a submenu item, expand the parent menu
+                    var parentSubmenu = $(this).closest('.submenu');
+                    if (parentSubmenu.length) {
+                        parentSubmenu.addClass('show');
+                        var parentMenuLink = parentSubmenu.prev('.nav-link[data-toggle="collapse"]');
+                        parentMenuLink.attr('aria-expanded', 'true');
+                        parentMenuLink.addClass('active');
+                    }
+                }
+            });
+
+            // Special handling for finance section
+            if (currentUrl.indexOf('tithepayment') !== -1) {
+                $('#finance-submenu').addClass('show');
+                $('#finance-submenu').prev('.nav-link').attr('aria-expanded', 'true');
+            }
+        }
+
+        // Initialize active menu on page load
+        setActiveMenu();
+
+        // Handle window resize
+        $(window).resize(function() {
+            if ($(window).width() >= 992) {
+                $('.nav-left-sidebar').addClass('show');
+                $('.sidebar-overlay').removeClass('show');
+            } else {
+                $('.nav-left-sidebar').removeClass('show');
+            }
+        });
+
+        // Initialize sidebar state based on screen size
+        if ($(window).width() >= 992) {
+            $('.nav-left-sidebar').addClass('show');
+        }
+
+        // Prevent dropdown from closing when clicking inside
+        $('.dropdown-menu').on('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+                    // Function to update receipt counts
+        function updateReceiptCounts() {
+            // Try to get counts from current page first
+            const unprintedCountEl = document.getElementById('unprinted-count-data');
+            if (unprintedCountEl) {
+                const count = unprintedCountEl.getAttribute('data-count');
+                $('#unprinted-count').text(count);
+                $('#pending-print-count').text(count);
+                return;
+            }
+            
+            // Fallback to AJAX
+            $.ajax({
+                url: '{% url "tithepayment:receipt_list" %}?ajax_counts=true',
+                type: 'GET',
+                success: function(data) {
+                    if (data.unprinted_count !== undefined) {
+                        $('#unprinted-count').text(data.unprinted_count);
+                        $('#pending-print-count').text(data.unprinted_count);
+                    }
+                },
+                error: function() {
+                    // Set default values
+                    $('#unprinted-count').text('0');
+                    $('#pending-print-count').text('0');
+                }
+            });
+        }
+
+        // Update counts on page load
+        $(document).ready(function() {
+            updateReceiptCounts();
+            
+            // Update counts periodically
+            setInterval(updateReceiptCounts, 30000);
+            
+            // Update counts when finance menu is opened
+            $('a[href="#finance-submenu"]').on('click', function() {
+                setTimeout(updateReceiptCounts, 100);
+            });
+        });
+    // Global function to toggle sidebar (can be called from other scripts)
+    function toggleSidebar() {
+        $('.nav-left-sidebar').toggleClass('show');
+        $('.sidebar-overlay').toggleClass('show');
+    }
+    </script>
+
+    {% block script %}
+    <!-- Additional scripts will be inserted here -->
+    {% endblock script %}
+</body>
+</html>

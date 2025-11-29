@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="dashboard-main-wrapper">
+    <div class="dashboard-wrapper">
+        <div class="container-fluid dashboard-content">
+            <!-- Page Header -->
+            <div class="row">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                    <div class="page-header">
+                        <h2 class="pageheader-title">
+                            <i class="fas fa-money-bill-wave mr-2"></i>Payment Details
+                        </h2>
+                        <div class="page-breadcrumb">
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="breadcrumb-link">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="{% url 'tithepayment:tithepayment_list' %}" class="breadcrumb-link">Tithe Payments</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Payment Details</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            {% if messages %}
+            <div class="row">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="row">
+                <!-- Payment Details -->
+                <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title">Payment Information</h4>
+                            <div>
+                                <a href="{% url 'tithepayment:tithepayment_update' payment.pk %}" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a href="{% url 'tithepayment:tithepayment_list' %}" class="btn btn-secondary btn-sm">
+                                    <i class="fas fa-arrow-left"></i> Back to List
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>Member Details</h5>
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <th width="40%">Member Name:</th>
+                                            <td>{{ payment.name.get_full_name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Contact Number:</th>
+                                            <td>{{ payment.contact_number }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Contributions:</th>
+                                            <td><strong>${{ member_total_contributions|floatformat:2 }}</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Payments:</th>
+                                            <td>{{ member_payment_count }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Payment Details</h5>
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <th width="40%">Amount:</th>
+                                            <td><strong class="text-success">${{ payment.amount }}</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Payment Method:</th>
+                                            <td>
+                                                <span class="badge {% if payment.status == 'cash' %}badge-success{% else %}badge-primary{% endif %}">
+                                                    {{ payment.get_status_display }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Payment Date:</th>
+                                            <td>{{ payment.date|date:"M d, Y H:i" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Created:</th>
+                                            <td>{{ payment.date|timesince }} ago</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Related Payments -->
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">Recent Payments from {{ payment.name.get_full_name }}</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if related_payments %}
+                            <div class="list-group">
+                                {% for related_payment in related_payments %}
+                                <a href="{% url 'tithepayment:tithepayment_detail' related_payment.pk %}" 
+                                   class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">${{ related_payment.amount }}</h6>
+                                        <small>{{ related_payment.date|date:"M d" }}</small>
+                                    </div>
+                                    <p class="mb-1">
+                                        <span class="badge {% if related_payment.status == 'cash' %}badge-success{% else %}badge-primary{% endif %}">
+                                            {{ related_payment.get_status_display }}
+                                        </span>
+                                    </p>
+                                </a>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted">No other payments found for this member.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'tithepayment:tithepayment_update' payment.pk %}" class="btn btn-warning">
+                                    <i class="fas fa-edit"></i> Edit Payment
+                                </a>
+                                <a href="{% url 'tithepayment:tithepayment_delete' payment.pk %}" class="btn btn-danger">
+                                    <i class="fas fa-trash"></i> Delete Payment
+                                </a>
+                                <a href="{% url 'tithepayment:tithepayment_create' %}?member={{ payment.name.id }}" 
+                                   class="btn btn-success">
+                                    <i class="fas fa-plus"></i> New Payment for {{ payment.name.first_name }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

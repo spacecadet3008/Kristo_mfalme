@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block internal_style %}
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-align: center;
+            align-items: center;
+            padding-top: 40px;
+            padding-bottom: 40px;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+    </style>
+{% endblock internal_style %}
+
+{% block main_content %}
+    <form class="splash-container" method="post" action="{% url 'signup_user' %}">
+        {% csrf_token %}
+        
+        <!-- Display messages -->
+        {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-1 text-warning">Account Creation</h3>
+                <p>Please enter your user information to get registered</p>
+            </div>
+            <div class="card-body">
+                
+                <!-- Username Field -->
+                <div class="form-group">
+                    <input class="form-control form-control-lg {% if form.username.errors %}is-invalid{% endif %}" 
+                           type="text" 
+                           id="{{ form.username.id_for_label }}" 
+                           name="{{ form.username.name }}" 
+                           value="{{ form.username.value|default:'' }}"
+                           required 
+                           placeholder="Username" 
+                           autocomplete="off">
+                    {% if form.username.errors %}
+                        <div class="error-message">
+                            {% for error in form.username.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Email Field -->
+                <div class="form-group">
+                    <input class="form-control form-control-lg {% if form.email.errors %}is-invalid{% endif %}" 
+                           type="email" 
+                           id="{{ form.email.id_for_label }}" 
+                           name="{{ form.email.name }}" 
+                           value="{{ form.email.value|default:'' }}"
+                           required 
+                           placeholder="E-mail (someone@email.com)" 
+                           autocomplete="off">
+                    {% if form.email.errors %}
+                        <div class="error-message">
+                            {% for error in form.email.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Password1 Field -->
+                <div class="form-group">
+                    <input class="form-control form-control-lg {% if form.password1.errors %}is-invalid{% endif %}" 
+                           id="{{ form.password1.id_for_label }}" 
+                           name="{{ form.password1.name }}" 
+                           type="password" 
+                           required 
+                           placeholder="Password">
+                    {% if form.password1.errors %}
+                        <div class="error-message">
+                            {% for error in form.password1.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Password2 Field -->
+                <div class="form-group">
+                    <input class="form-control form-control-lg {% if form.password1.errors %}is-invalid{% endif %}" 
+                           id="{{ form.password2.id_for_label }}" 
+                           name="{{ form.password2.name }}" 
+                           type="password" 
+                           required 
+                           placeholder="Confirm Password">
+                    {% if form.password2.errors %}
+                        <div class="error-message">
+                            {% for error in form.password2.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Display non-field errors -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="form-group pt-2">
+                    <button class="btn btn-block btn-warning text-light" type="submit">Register My Account</button>
+                </div>
+            </div>
+            <div class="card-footer bg-white">
+                <p>Already member? <a href="{% url 'login_user' %}" class="text-secondary">Login Here.</a></p>
+            </div>
+        </div>
+    </form>
+{% endblock main_content %}

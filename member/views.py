@@ -260,150 +260,77 @@ def filter_members(request):
     return render(request, template, context)
 
 
-@login_required
-def add_member(request):
-    # TODO: Make This functionality available only to admins
-    template = "members/add.html"
-    form = MemberForm()
-    shepherds = CommunityLeader.objects.all()
-    ministries = Ministry.objects.all()
-    profile = UserProfile.objects.get_or_create(user=request.user)
-    """    context = {"form": form, "shepherds": shepherds, "ministries": ministries, "members_active_add": "active", "profile": profile}
-        return render(request, template, context)
-    """
-    if request == "POST":
-        # check if there's multiple members
-        member_count = request.POST.get('member_count')
+from django.views.generic import CreateView, ListView, TemplateView
+from django.urls import reverse_lazy
 
-        if member_count and member_count.isdigit():
-            member_count = int(member_count)
-            success_count = 0
-            error_messages = []
-
-            # process each member form
-
-            for i in range(1, member_count + 1):
-                try:
-                    # determie form using suffix number 1,2 ____
-                    prefix = '' if i == 1 else f'_{i}'
-
-                    member_data = {
-                        'name': request.POST.get(f'name{prefix}', '').strip(),
-                        'telephone': request.POST.get(f'telephone{prefix}', '').strip(),
-                        'shepherd': request.POST.get(f'shepherd{prefix}'),
-                        'ministry': request.POST.get(f'ministry{prefix}'),
-                        'location': request.POST.get(f'location{prefix}', '').strip(),
-                        'guardians_name': request.POST.get(f'guardians_name{prefix}', '').strip(),
-                        'fathers_name': request.POST.get(f'fathers_name{prefix}', '').strip(),
-                        'mothers_name': request.POST.get(f'mothers_name{prefix}', '').strip(),
-                        'code': request.POST.get(f'code{prefix}', '').strip(),
-                        'new_believer_school': request.POST.get(f'new_believer_school{prefix}') == 'true',
-                        'pays_tithe': request.POST.get(f'pays_tithe{prefix}') == 'true',
-                        'working': request.POST.get(f'working{prefix}') == 'true',
-                        'schooling': request.POST.get(f'schooling{prefix}') == 'true',
-                    }
-
-
-                    picture_file = request.FILES.get(f'picture{prefix}')
-                    if picture_file:
-                        member_data['picture'] = picture_file
-
-
-                    if not member_data['name']:
-                        error_messages.append(f"Member {i}: Name is required")
-                        continue
-                    
-                    if not member_data['shepherd']:
-                        error_messages.append(f"Member {i}: Community is required")
-                        continue
-                    
-                    if not member_data['telephone']:
-                        error_messages.append(f"Member {i}: telephone is required")
-                        continue
-
-
-                    member_form = MemberForm(member_data, request.FILES)
-                    if member_form.is_valid():
-                        member = member_form.save(commit=False)
-                        # future processing here if needed
-                        member.save()
-                        success_count += 1
-                    else:
-                        # Collect form errors
-                        for field, errors in member_form.errors.items():
-                            for error in errors:
-                                error_messages.append(f"Member {i}: {field} - {error}")
-
-                except Exception as e:
-                    error_messages.append(f"Member {i}: Error - {str(e)}")
-            
-            # Prepare response messages
-            if success_count > 0:
-                if success_count == member_count:
-                    messages.success(request, f"All {success_count} members were added successfully!")
-                else:
-                    messages.warning(request, f"{success_count} out of {member_count} members were added successfully.")
-            
-            if error_messages:
-                # Show first 5 errors to avoid overwhelming the user
-                display_errors = error_messages[:5]
-                for error in display_errors:
-                    messages.error(request, error)
-                if len(error_messages) > 5:
-                    messages.error(request, f"... and {len(error_messages) - 5} more errors")
-            
-            # If it's an AJAX request, return JSON response
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                from django.http import JsonResponse
-                return JsonResponse({
-                    'success': True,
-                    'success_count': success_count,
-                    'total_count': member_count,
-                    'errors': error_messages
-                })
-        else:
-            # Handle single member submission (original functionality)
-            form = MemberForm(request.POST, request.FILES)
-            if form.is_valid():
-                member = form.save()
-                messages.success(request, f"Member {member.name} was added successfully!")
-                
-                # If it's an AJAX request, return JSON response
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    from django.http import JsonResponse
-                    return JsonResponse({
-                        'success': True,
-                        'member_name': member.name,
-                        'message': f"Member {member.name} was added successfully!"
-                    })
-            else:
-                messages.error(request, "Please correct the errors below.")
+class BaseMemberView:
+    template_name = 'members/add.html'
     
-    context = {
-        "form": form, 
-        "shepherds": shepherds, 
-        "ministries": ministries, 
-        "members_active_add": "active", 
-        "profile": profile
-    }
-    return render(request, template, context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add mode to context to differentiate between single and multiple
+        context['mode'] = getattr(self, 'mode', 'single')
+        return context
 
-@login_required
-def create_member(request):
-    # TODO: Make this functionality available only to admins
-    if request.method == "POST":
-        form = MemberForm(request.POST, request.FILES)
-        # import pdb; pdb.set_trace()
-        if form.is_valid():
-            member = form.save(commit=False)
-            member.active = True
-            member.save()
-            messages.success(request, "Church Member Added Successfully")
-            return redirect("list_members")
+# Single member creation view
+class AddMemberView(BaseMemberView, CreateView):
+    model = Member
+    form_class = MemberForm
+    success_url = reverse_lazy('list_members')
+    mode = 'single'
+    
+    def form_valid(self, form,request):
+        messages.success(self.request, 'Member added successfully!')
+        profile = UserProfile.objects.get_or_create(user=request.user)
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, 'Please correct the errors below.')
+        return super().form_invalid(form)
+
+# Multiple members creation view
+class CreateMembersView(BaseMemberView, TemplateView):
+    mode = 'multiple'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add 3 empty forms for multiple member creation
+        context['form1'] = MemberForm(prefix='form1')
+        context['form2'] = MemberForm(prefix='form2')
+        context['form3'] = MemberForm(prefix='form3')
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        form1 = MemberForm(request.POST, request.FILES, prefix='form1')
+        form2 = MemberForm(request.POST, request.FILES, prefix='form2')
+        form3 = MemberForm(request.POST, request.FILES, prefix='form3')
+        
+        forms = [form1, form2, form3]
+        saved_count = 0
+        
+        for form in forms:
+            # Only save forms that have name field filled (at least some data)
+            if form.is_valid() and form.cleaned_data.get('name'):
+                form.save()
+                saved_count += 1
+        
+        if saved_count > 0:
+            messages.success(request, f'Successfully added {saved_count} member(s)!')
+            return redirect('member_list')
         else:
-            messages.error(request, "Church Member Creation Failed")
-            return redirect('add_member')
+            messages.error(request, 'Please fill at least one member form completely.')
+            return self.render_to_response({
+                'form1': form1,
+                'form2': form2,
+                'form3': form3,
+                'mode': 'multiple'
+            })
 
+class MemberListView(ListView):
+    model = Member
+    template_name = 'members/member_list.html'
+    context_object_name = 'members'
+    paginate_by = 20
 
 @login_required
 def list_ministries(request):

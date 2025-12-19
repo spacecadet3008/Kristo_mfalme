@@ -56,7 +56,7 @@ class CommunityLeader(models.Model):
     name = models.CharField(max_length=250 , null=True)
     leader = models.CharField(max_length=255, choices=RANK_CHOICES, null=True)
     description = models.TextField(blank=True)
-    phone = models.CharField(max_length=255, blank=True, null=True)
+    phone = PhoneNumberField(max_length=255,blank=True, null=True)
     
     class Meta:
         unique_together = ['community_name', 'leader']  # Prevent duplicate positions in same community
@@ -100,9 +100,9 @@ class Member(models.Model):
     name = models.CharField(max_length=255)
     code = models.TextField(help_text="001PT", null= True)
     active = models.BooleanField(default= True)
-    shepherd = models.ForeignKey(CommunityLeader, on_delete=models.CASCADE, null=True, blank=True)
+    shepherd = models.ForeignKey(Community, on_delete=models.CASCADE, null=True, blank=True)
     ministry = models.ForeignKey(Ministry, on_delete=models.CASCADE, null=True, blank=True)
-    telephone = models.PositiveIntegerField(max_length=255, null=True, help_text=' Eg. +255 ')
+    telephone =PhoneNumberField(max_length=255, null=True, help_text=' Eg. +255 ')
     location = models.CharField(max_length=255)
     fathers_name = models.CharField(max_length=255, null=True, blank=True)
     mothers_name = models.CharField(max_length=255, null=True, blank=True)
@@ -117,6 +117,8 @@ class Member(models.Model):
 
     def __str__(self):
         return f'{self.name} {self.telephone}'
+    
+
 
 
 class TestDb(models.Model):

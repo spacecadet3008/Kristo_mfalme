@@ -1,10 +1,10 @@
 from django.urls import path
 
 from .views import (
-    table_members, list_members, thumbnail_members, detail_member, edit_member, update_member, add_member, create_member, restore_member,
+    table_members, list_members, thumbnail_members, detail_member, edit_member, update_member, restore_member,
     delete_member, filter_members, search_members, get_members_by_statuses, get_members_by_shepherds, list_deleted_members,
     list_ministries, add_ministries, create_ministry,
-    list_shepherds, add_shepherd, create_shepherd,edit_community,delete_community
+    list_shepherds, add_shepherd, create_shepherd,edit_community,delete_community, CreateMembersView,AddMemberView
 )
 
 urlpatterns = [
@@ -15,8 +15,8 @@ urlpatterns = [
     path('detail/<int:pk>/', detail_member, name="detail_member"),
     path('edit/<int:pk>/', edit_member, name="edit_member"),
     path('update/<int:pk>/', update_member, name="update_member"),
-    path('add/', add_member, name="add_member"),
-    path('create/', create_member, name="create_member"),
+    path('add/', AddMemberView.as_view(), name="add_member"),
+    path('create/', CreateMembersView.as_view(), name="create_member"),
     path('delete/<int:pk>/', delete_member, name="delete_member"),
     path('filter/', filter_members, name="filter_members"),
     path('list/search/', search_members, name="search_members"),

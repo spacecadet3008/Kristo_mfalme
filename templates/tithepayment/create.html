@@ -13,6 +13,8 @@
         width: 100%;
         display: none;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-radius: 4px;
+        margin-top: 2px;
     }
     .member-option {
         padding: 10px 15px;
@@ -21,7 +23,7 @@
         transition: background-color 0.2s;
     }
     .member-option:hover {
-        background-color: #f8f9fa;
+        background-color: #f5f5f5;
     }
     .member-option:last-child {
         border-bottom: none;
@@ -31,6 +33,17 @@
     }
     .form-group {
         position: relative;
+        margin-bottom: 1.5rem;
+    }
+    .readonly-field {
+        background-color: #f8f9fa;
+        cursor: not-allowed;
+    }
+    .search-loading {
+        padding: 10px;
+        text-align: center;
+        color: #666;
+        font-style: italic;
     }
 </style>
 {% endblock %}
@@ -94,36 +107,49 @@
                                 </div>
                                 {% endif %}
 
-                                <!-- Member Search -->
+                                <!-- Member Search and Selection -->
                                 <div class="form-group">
-                                    <label for="member_search">Search Member *</label>
-                                    <input type="text" class="form-control" id="member_search" 
-                                           placeholder="Type member name to search..." autocomplete="off"
-                                           value="{% if form.instance.name %}{{ form.instance.name.get_full_name }}{% endif %}">
-                                    <div class="member-search-results" id="member_search_results"></div>
-                                    <small class="form-text text-muted">Start typing to search for members. Select from dropdown.</small>
-                                </div>
-
-                                <!-- Selected Member Info -->
-                                <div class="form-group" id="selected_member_info" 
-                                     style="{% if not form.instance.name %}display: none;{% endif %}">
-                                    <div class="alert alert-info">
-                                        <strong>Selected Member:</strong>
-                                        <span id="selected_member_name">
-                                            {% if form.instance.name %}{{ form.instance.name.get_full_name }}{% endif %}
-                                        </span> - 
-                                        <span id="selected_member_contact">
-                                            {% if form.instance.name %}{{ form.instance.name.contact_number }}{% endif %}
-                                        </span>
+                                    <label for="member_search">Select Member *</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="member_search" 
+                                               placeholder="Type member name to search..." autocomplete="off"
+                                               value="{% if form.instance.name %}{{ form.instance.name.name }}{% endif %}">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button" id="clear_search" title="Clear Search">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-
-                                <!-- Hidden Member Field -->
-                                <div class="form-group">
-                                    <label for="{{ form.name.id_for_label }}">Member *</label>
-                                    {{ form.name }}
+                                    <div class="member-search-results" id="member_search_results"></div>
+                                    <small class="form-text text-muted">Type at least 2 characters to search members</small>
+                                    
+                                    <!-- Hidden field for selected member -->
+                                    <input type="hidden" id="selected_member_id" name="name" 
+                                           value="{% if form.instance.name %}{{ form.instance.name.id }}{% endif %}">
+                                    
+                                    <!-- Display selected member info -->
+                                    <div id="selected_member_display" 
+                                         class="mt-2 p-2 border rounded bg-light" 
+                                         style="{% if not form.instance.name %}display: none;{% endif %}">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong id="selected_member_name">
+                                                    {% if form.instance.name %}{{ form.instance.name.name }}{% endif %}
+                                                </strong>
+                                                <br>
+                                                <small class="text-muted" id="selected_member_telephone">
+                                                    {% if form.instance.name %}{{ form.instance.name.telephone|default:"No telephone" }}{% endif %}
+                                                </small>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" id="remove_member" title="Remove Member">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Display form errors for name field -->
                                     {% if form.name.errors %}
-                                    <div class="text-danger">
+                                    <div class="text-danger small mt-1">
                                         {% for error in form.name.errors %}
                                         {{ error }}
                                         {% endfor %}
@@ -131,12 +157,17 @@
                                     {% endif %}
                                 </div>
 
-                                <!-- Contact Number -->
+                                <!-- Telephone (Read-only) -->
                                 <div class="form-group">
-                                    <label for="{{ form.contact_number.id_for_label }}">Contact Number</label>
-                                    {{ form.contact_number }}
+                                    <label>Telephone</label>
+                                    <input type="text" class="form-control readonly-field" 
+                                           id="telephone_display" readonly
+                                           value="{% if form.instance.name %}{{ form.instance.name.telephone|default:'' }}{% endif %}">
+                                    <input type="hidden" id="id_contact_number" name="contact_number"
+                                           value="{% if form.instance.name %}{{ form.instance.name.telephone|default:'' }}{% endif %}">
+                                    
                                     {% if form.contact_number.errors %}
-                                    <div class="text-danger">
+                                    <div class="text-danger small mt-1">
                                         {% for error in form.contact_number.errors %}
                                         {{ error }}
                                         {% endfor %}
@@ -208,12 +239,12 @@
                             <h6>Adding Tithe Payments:</h6>
                             <ul class="list-unstyled">
                                 <li><i class="fas fa-check text-success mr-2"></i>Search for member by name</li>
-                                <li><i class="fas fa-check text-success mr-2"></i>Contact number auto-populates</li>
+                                <li><i class="fas fa-check text-success mr-2"></i>Telephone auto-fills</li>
                                 <li><i class="fas fa-check text-success mr-2"></i>Select payment method</li>
                                 <li><i class="fas fa-check text-success mr-2"></i>Enter payment amount</li>
                             </ul>
                             <div class="alert alert-warning mt-3">
-                                <strong>Note:</strong> Contact number field is automatically filled when you select a member.
+                                <strong>Note:</strong> Telephone is automatically retrieved from member record.
                             </div>
                         </div>
                     </div>
@@ -245,53 +276,94 @@ $(document).ready(function() {
     let memberSearchTimeout;
     const memberSearchInput = $('#member_search');
     const memberSearchResults = $('#member_search_results');
-    const memberSelect = $('#id_name');
+    const selectedMemberId = $('#selected_member_id');
+    const telephoneDisplay = $('#telephone_display');
     const contactNumberInput = $('#id_contact_number');
-    const selectedMemberInfo = $('#selected_member_info');
+    const selectedMemberDisplay = $('#selected_member_display');
     const selectedMemberName = $('#selected_member_name');
-    const selectedMemberContact = $('#selected_member_contact');
+    const selectedMemberTelephone = $('#selected_member_telephone');
+
+    // Get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
 
     // Member search functionality
     memberSearchInput.on('input', function() {
         clearTimeout(memberSearchTimeout);
-        const query = $(this).val();
+        const query = $(this).val().trim();
         
         if (query.length < 2) {
-            memberSearchResults.hide();
+            memberSearchResults.hide().empty();
             return;
         }
 
         memberSearchTimeout = setTimeout(function() {
+            // Show loading indicator
+            memberSearchResults.html('<div class="search-loading"><i class="fas fa-spinner fa-spin mr-2"></i>Searching members...</div>').show();
+            
+            console.log('Sending search request for:', query);
+            
             $.ajax({
                 url: '{% url "tithepayment:search_members" %}',
-                data: {
-                    'q': query
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': csrftoken
                 },
-                success: function(data) {
+                data: {
+                    'search': query
+                },
+                success: function(data, status, xhr) {
+                    console.log('Search successful! Status:', status);
+                    console.log('Response data:', data);
+                    console.log('Response headers:', xhr.getAllResponseHeaders());
+                    
                     memberSearchResults.empty();
+                    
+                    if (data.error) {
+                        memberSearchResults.html('<div class="member-option text-danger">Server Error: ' + data.error + '</div>').show();
+                        return;
+                    }
+                    
                     if (data.members && data.members.length > 0) {
-                        data.members.forEach(function(member) {
+                        console.log('Found', data.members.length, 'members');
+                        data.members.forEach(function(member, index) {
+                            console.log('Member', index, ':', member);
                             const option = $('<div class="member-option"></div>');
-                            const highlightQuery = query.toLowerCase();
-                            const fullName = member.first_name + ' ' + member.last_name;
-                            const displayName = fullName.replace(
-                                new RegExp(query, 'gi'), 
-                                match => `<strong>${match}</strong>`
-                            );
+                            const memberName = member.name || '';
+                            const telephone = member.telephone || 'No telephone';
+                            
+                            // Create highlighted name
+                            const displayName = highlightMatch(memberName, query);
                             
                             option.html(`
-                                <div>${displayName}</div>
-                                <small class="text-muted">${member.contact_number}</small>
+                                <div class="font-weight-bold">${displayName}</div>
+                                <small class="text-muted">${telephone}</small>
                             `);
-                            option.attr('data-member-id', member.id);
-                            option.attr('data-contact-number', member.contact_number);
-                            option.attr('data-full-name', fullName);
+                            
+                            option.data({
+                                'member-id': member.id,
+                                'name': memberName,
+                                'telephone': telephone
+                            });
                             
                             option.click(function() {
                                 selectMember(
-                                    $(this).attr('data-member-id'),
-                                    $(this).attr('data-full-name'),
-                                    $(this).attr('data-contact-number')
+                                    $(this).data('member-id'),
+                                    $(this).data('name'),
+                                    $(this).data('telephone')
                                 );
                             });
                             
@@ -299,53 +371,122 @@ $(document).ready(function() {
                         });
                         memberSearchResults.show();
                     } else {
-                        memberSearchResults.hide();
+                        console.log('No members found in response');
+                        memberSearchResults.html('<div class="member-option text-muted">No members found for "' + query + '"</div>').show();
                     }
                 },
-                error: function() {
-                    memberSearchResults.hide();
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error Details:');
+                    console.error('Status:', status);
+                    console.error('Error:', error);
+                    console.error('XHR Status:', xhr.status);
+                    console.error('XHR Status Text:', xhr.statusText);
+                    console.error('Response Text:', xhr.responseText);
+                    
+                    let errorMsg = 'Error connecting to server';
+                    if (xhr.status === 404) {
+                        errorMsg = 'Search endpoint not found (404). Check URL.';
+                    } else if (xhr.status === 403) {
+                        errorMsg = 'Access forbidden. Please login again.';
+                    } else if (xhr.status === 500) {
+                        errorMsg = 'Server error. Check Django console.';
+                    } else if (xhr.status === 0) {
+                        errorMsg = 'Network error. Check if server is running.';
+                    }
+                    
+                    memberSearchResults.html('<div class="member-option text-danger">' + errorMsg + ' (Status: ' + xhr.status + ')</div>').show();
+                },
+                complete: function() {
+                    console.log('AJAX request completed');
                 }
             });
-        }, 300);
+        }, 500);
     });
 
-    // Select member function
-    function selectMember(memberId, fullName, contactNumber) {
-        memberSelect.val(memberId);
-        contactNumberInput.val(contactNumber);
+    // Helper function to highlight matches
+    function highlightMatch(text, query) {
+        if (!query || !text) return text;
         
-        selectedMemberName.text(fullName);
-        selectedMemberContact.text(contactNumber);
-        selectedMemberInfo.show();
-        
-        memberSearchInput.val(fullName);
-        memberSearchResults.hide();
+        try {
+            const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`(${escapedQuery})`, 'gi');
+            return text.replace(regex, '<strong>$1</strong>');
+        } catch (e) {
+            return text;
+        }
     }
 
+    // Select member function
+    function selectMember(memberId, name, telephone) {
+        console.log('Selecting member:', {memberId, name, telephone});
+        
+        // Set the hidden input value
+        selectedMemberId.val(memberId);
+        
+        // Update telephone display (read-only)
+        telephoneDisplay.val(telephone);
+        contactNumberInput.val(telephone);
+        
+        // Update selected member display
+        selectedMemberName.text(name);
+        selectedMemberTelephone.text(telephone || 'No telephone');
+        selectedMemberDisplay.show();
+        
+        // Clear search input and results
+        memberSearchInput.val('');
+        memberSearchResults.hide().empty();
+        
+        // Focus on amount field
+        $('#id_amount').focus();
+    }
+
+    // Clear search button
+    $('#clear_search').click(function() {
+        memberSearchInput.val('');
+        memberSearchResults.hide().empty();
+        memberSearchInput.focus();
+    });
+
+    // Remove selected member
+    $('#remove_member').click(function() {
+        selectedMemberId.val('');
+        telephoneDisplay.val('');
+        contactNumberInput.val('');
+        selectedMemberDisplay.hide();
+        memberSearchInput.focus();
+    });
+
     // Hide search results when clicking outside
-    $(document).click(function(e) {
+    $(document).on('click', function(e) {
         if (!$(e.target).closest('#member_search, #member_search_results').length) {
             memberSearchResults.hide();
         }
     });
 
-    // Initialize form with existing data
-    {% if form.instance.pk and form.instance.name %}
-    // Form is already initialized with member data
-    {% endif %}
+    // Test the URL
+    console.log('=== DEBUG INFO ===');
+    console.log('Search URL:', '{% url "tithepayment:search_members" %}');
+    console.log('Full URL:', window.location.origin + '{% url "tithepayment:search_members" %}');
+    console.log('CSRF Token exists:', csrftoken ? 'Yes' : 'No');
+    console.log('Member search input exists:', memberSearchInput.length > 0);
+    console.log('=== END DEBUG ===');
 
     // Form validation
-    $('#tithePaymentForm').on('submit', function() {
-        const memberId = memberSelect.val();
+    $('#tithePaymentForm').on('submit', function(e) {
+        const memberId = selectedMemberId.val();
         const amount = $('#id_amount').val();
         
         if (!memberId) {
-            alert('Please select a member.');
+            e.preventDefault();
+            alert('❌ Please select a member from the search results.');
+            memberSearchInput.focus();
             return false;
         }
         
         if (!amount || parseFloat(amount) <= 0) {
-            alert('Please enter a valid amount.');
+            e.preventDefault();
+            alert('❌ Please enter a valid amount greater than 0.');
+            $('#id_amount').focus();
             return false;
         }
         

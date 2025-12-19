@@ -1,4 +1,3 @@
-# sms_service.py
 from django.conf import settings
 import logging
 

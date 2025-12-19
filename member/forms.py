@@ -6,17 +6,34 @@ from .models import Member, Ministry, CommunityLeader
 class MemberForm(forms.ModelForm):
     class Meta:
         model = Member
-        fields = ['name', 'shepherd','code', 'ministry', 'telephone', 'location', 'fathers_name', 'mothers_name',
-                  'guardians_name', 'new_believer_school', 'pays_tithe', 'working', 'schooling',
-                  'picture']
-
-    def __init__(self, *args, **kwargs):
-        super(MemberForm, self).__init__(*args, **kwargs)
-
-        not_required = ('telephone', 'fathers_name', 'mothers_name', 'guardians_name', 'picture')
-        for field in not_required:
-            self.fields[field].required = False
-
+        fields = [
+            'name', 'code', 'active', 'shepherd', 'ministry', 'telephone',
+            'location', 'fathers_name', 'mothers_name', 'guardians_name',
+            'new_believer_school', 'pays_tithe', 'working', 'schooling', 'picture'
+        ]
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter full name'}),
+            'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 001PT'}),
+            'telephone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+255 XXX XXX XXX'}),
+            'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter location'}),
+            'fathers_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'mothers_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'guardians_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'shepherd': forms.Select(attrs={'class': 'form-control'}),
+            'ministry': forms.Select(attrs={'class': 'form-control'}),
+            'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'new_believer_school': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'pays_tithe': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'working': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'schooling': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'picture': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+    
+"""    def clean_telephone(self):
+        telephone = self.cleaned_data.get('telephone')
+        if telephone and not telephone.startswith('+'):
+            raise forms.ValidationError("Phone number must start with country code (e.g., +255)")
+        return telephone"""
 
 class MinistryForm(forms.ModelForm):
     class Meta:

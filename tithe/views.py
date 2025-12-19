@@ -1,4 +1,3 @@
-# tithepayment/views.py
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
@@ -155,7 +154,7 @@ class TithePaymentCreateView(LoginRequiredMixin, CreateView):
         
         messages.success(
             self.request, 
-            f'Tithe payment of ${form.cleaned_data["amount"]} for {member.name} created successfully!'
+            f'Tithe payment of Tsh {form.cleaned_data["amount"]} for {member.name} created successfully!'
         )
         return super().form_valid(form)
 
@@ -298,40 +297,32 @@ class TithePaymentSummaryView(LoginRequiredMixin, TemplateView):
         
         return context
 
-
-# API Views for AJAX functionality
+@login_required
 def search_members(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({'error': 'Authentication required'}, status=401)
+    """Search members by name or telephone"""
+    search_term = request.GET.get('search', '').strip()
     
-    query = request.GET.get('q', '').strip()
-    
-    if len(query) < 2:
+    if len(search_term) < 2:
         return JsonResponse({'members': []})
     
     try:
         members = Member.objects.filter(
-            Q(name__icontains=query) |
-            Q(telephone__icontains=query) |
-            Q(fathers_name__icontains=query) |
-            Q(mothers_name__icontains=query)
-        ).order_by('name')[:15]
+            Q(name__icontains=search_term) | 
+            Q(telephone__icontains=search_term)
+        ).order_by('name')[:10]
         
-        member_list = []
+        members_data = []
         for member in members:
-            member_list.append({
+            members_data.append({
                 'id': member.id,
                 'name': member.name,
-                'telephone': member.telephone,
-                'full_name': member.name,
-                'display_text': f"{member.name} - {member.telephone}"
+                'telephone': str(member.telephone) if member.telephone else '',
             })
         
-        return JsonResponse({'members': member_list})
-    
+        return JsonResponse({'members': members_data})
+        
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-
+        return JsonResponse({'error': str(e), 'members': []})
 
 def get_member_details(request, member_id):
     if not request.user.is_authenticated:

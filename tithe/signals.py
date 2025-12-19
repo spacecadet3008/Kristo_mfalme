@@ -1,9 +1,8 @@
-# signals.py
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
 from .models import TithePayment
-from .sms_service import sms_service  # Now using our abstracted service
+from .sms_service import sms_service 
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,14 +14,15 @@ def send_tithe_sms_notification(sender, instance, created, **kwargs):
         return
     
     try:
-        phone_number = instance.member.contact_number
+        phone_number = instance.contact_number
         if not phone_number:
             return
         
         if created:
-            message = f"Hello {instance.member.name}, your tithe of ${instance.amount} has been recorded. Thank you!"
+            message = f"Hello {instance.name.name}, your tithe of Tsh {instance.amount} has been recorded. Thank you!"
+            print(message)
         else:
-            message = f"Hello {instance.member.name}, your tithe has been updated to ${instance.amount}. Thank you!"
+            message = f"Hello {instance.name.name}, your tithe has been updated to Tsh {instance.amount}. Thank you!"
         
         # This line never changes regardless of provider!
         result = sms_service.send_sms(phone_number, message)

@@ -30,10 +30,7 @@
                         <div class="card-body">
                             <div class="d-inline-block">
                                 <h5 class="text-muted">Total Collected</h5>
-                                <h2 class="mb-0">${{ total_amount|floatformat:2 }}</h2>
-                            </div>
-                            <div class="float-right icon-circle-medium  icon-box-lg  bg-brand-light mt-1">
-                                <i class="fas fa-dollar-sign fa-fw fa-sm text-success"></i>
+                                <h2 class="mb-0">Tsh {{ total_amount|floatformat:2 }}</h2>
                             </div>
                         </div>
                     </div>
@@ -151,9 +148,9 @@
                                         {% for payment in payments %}
                                         <tr>
                                             <td>{{ payment.date|date:"M d, Y H:i" }}</td>
-                                            <td>{{ payment.name.get_full_name }}</td>
+                                            <td>{{ payment.name}}</td>
                                             <td>{{ payment.contact_number }}</td>
-                                            <td><strong>${{ payment.amount }}</strong></td>
+                                            <td><strong>Tsh {{ payment.amount }}</strong></td>
                                             <td>
                                                 <span class="badge 
                                                     {% if payment.status == 'cash' %}badge-success

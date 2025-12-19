@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
 import dj_database_url
 from django.contrib import messages
 
@@ -23,12 +24,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-itd2w4^h)&0rk+y#9_unohgk#v1(_2-ta11j$ch^k$xxsq9q!-'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 """DEBUG = os.environ.get('DEBUG', 'True') == 'False'"""
 
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
+
+DATABASE_URL = config('DATABASE_URL')
+
 
 ALLOWED_HOSTS = [
     'localhost',
@@ -163,8 +167,8 @@ MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn", "media_root")
 
 # SMS Configuration
 # Africa's Talking Configuration (for testing)
-AFRICASTALKING_API_KEY = 'atsk_1eb3e83ef94c926d85400396b2466a21e0b5187f18c5a20a373e07acc6d33375fb45aee1'
-AFRICASTALKING_USERNAME = 'sandbox'
+AFRICASTALKING_API_KEY = config('AFRICASTALKING_API_KEY')
+AFRICASTALKING_USERNAME = config('AFRICASTALKING_USERNAME')
 
 # Or NextSMS Configuration
 NEXTSMS_API_KEY = 'your_nextsms_api_key'

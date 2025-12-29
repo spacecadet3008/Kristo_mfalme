@@ -30,4 +30,3 @@ tzdata==2025.2
 urllib3==2.5.0
 whitenoise==6.11.0
 yarl==1.22.0
-decouple==3.8

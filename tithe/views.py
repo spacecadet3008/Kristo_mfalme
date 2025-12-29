@@ -624,7 +624,7 @@ def print_receipt(request, receipt_id):
         "payment": receipt.tithe_payment,
         "print_data": receipt.get_print_data(),
     }
-    return render(request, "receipts/print_receipt.html", context)
+    return render(request, "tithepayment/print_receipt.html", context)
 
 @login_required
 def receipt_list(request):

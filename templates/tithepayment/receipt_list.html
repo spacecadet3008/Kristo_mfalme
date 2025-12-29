@@ -60,12 +60,12 @@
                                     <td>
                                         <div class="btn-group">
                                             {% if payment.has_receipt %}
-                                                <a href="{% url 'print_receipt' payment.receipt_data.id %}" 
+                                                <a href="{% url 'tithepayment:print_receipt' payment.receipt_data.id %}" 
                                                    class="btn btn-sm btn-primary" title="Print Receipt">
                                                     <i class="fa fa-print"></i>
                                                 </a>
                                             {% else %}
-                                                <a href="{% url 'generate_receipt' payment.id %}" 
+                                                <a href="{% url 'tithepayment:auto_generate_receipt' payment.id %}" 
                                                    class="btn btn-sm btn-success" title="Generate Receipt">
                                                     <i class="fa fa-receipt"></i>
                                                 </a>

@@ -12,9 +12,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-from decouple import config
+from dotenv import load_dotenv
 import dj_database_url
 from django.contrib import messages
+
+load_dotenv()  
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,20 +26,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'False'
 
 """DEBUG = config('DEBUG', default=True, cast=bool)"""
 
-DATABASE_URL = config('DATABASE_URL')
+DATABASE_URL = os.getenv('DATABASE_URL')
 
 
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    '.onrender.com',  # Allow all Render subdomains
+    '.onrender.com',  # Allow all Render subdomains 
 ]
 
 
@@ -167,8 +169,8 @@ MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn", "media_root")
 
 # SMS Configuration
 # Africa's Talking Configuration (for testing)
-AFRICASTALKING_API_KEY = config('AFRICASTALKING_API_KEY')
-AFRICASTALKING_USERNAME = config('AFRICASTALKING_USERNAME')
+AFRICASTALKING_API_KEY = os.getenv('AFRICASTALKING_API_KEY')
+AFRICASTALKING_USERNAME = os.getenv('AFRICASTALKING_USERNAME')
 
 # Or NextSMS Configuration
 NEXTSMS_API_KEY = 'your_nextsms_api_key'

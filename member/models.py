@@ -1,5 +1,6 @@
 from enum import member
 import os, random
+from django.conf import settings
 from phonenumber_field.modelfields import PhoneNumberField
 
 from django.db import models
@@ -118,7 +119,12 @@ class Member(models.Model):
     def __str__(self):
         return f'{self.name} {self.telephone}'
     
-
+    @property
+    def picture_url(self):
+        if self.picture and hasattr(self.picture, 'url'):
+            return self.picture.url
+        return f"{settings.STATIC_URL}images/default-avatar.png"
+    
 
 
 class TestDb(models.Model):

@@ -55,7 +55,7 @@ def list_members(request):
 def list_deleted_members(request):
     template = "members/list.html"
     members = Member.objects.deleted()
-    shepherds = Shepherd.objects.all()
+    shepherds = Community.objects.all()
     ministries = Ministry.objects.all()
     profile = UserProfile.objects.get_or_create(user=request.user)
     context = {
@@ -89,7 +89,8 @@ def edit_member(request, pk):
     shepherds = CommunityLeader.objects.all()
     ministries = Ministry.objects.all()
     profile = UserProfile.objects.get_or_create(user=request.user)
-    context = {"member": member, "form": form, "shepherds": shepherds, "ministries": ministries, "profile": profile}
+    picture = Member.objects.get(pk=pk).picture
+    context = {"member": member, "form": form, "shepherds": shepherds, "ministries": ministries, "profile": profile,"picture": picture}
     return render(request, template, context)
 
 
@@ -279,9 +280,9 @@ class AddMemberView(BaseMemberView, CreateView):
     success_url = reverse_lazy('list_members')
     mode = 'single'
     
-    def form_valid(self, form,request):
+    def form_valid(self,form):
         messages.success(self.request, 'Member added successfully!')
-        profile = UserProfile.objects.get_or_create(user=request.user)
+        profile = UserProfile.objects.get_or_create(user=self.request.user)
         return super().form_valid(form)
     
     def form_invalid(self, form):

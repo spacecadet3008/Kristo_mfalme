@@ -31,7 +31,6 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-"""DEBUG = config('DEBUG', default=True, cast=bool)"""
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 
@@ -137,6 +136,11 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+LANGUAGES = [
+    ('en', 'English'),
+    ('sw', 'Swahili'),
+]
 
 
 # Static files (CSS, JavaScript, Images)

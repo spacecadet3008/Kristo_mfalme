@@ -274,6 +274,7 @@ class BaseMemberView:
         return context
 
 # Single member creation view
+
 class AddMemberView(BaseMemberView, CreateView):
     model = Member
     form_class = MemberForm
@@ -326,7 +327,7 @@ class CreateMembersView(BaseMemberView, TemplateView):
                 'form3': form3,
                 'mode': 'multiple'
             })
-
+@login_required
 class MemberListView(ListView):
     model = Member
     template_name = 'members/member_list.html'
@@ -341,6 +342,13 @@ def list_ministries(request):
     context = {"ministries": ministries, "ministries_active_list": "active", "profile": profile}
     return render(request, template, context)
 
+def delete_ministry(request, pk):
+    if request.method == "POST":
+        ministry = get_object_or_404(Ministry,pk=pk)
+        ministry.delete()
+        messages.success(request, "Ministry Deleted Succesfully")
+        return redirect('list_ministries')
+
 
 @login_required
 def add_ministries(request):
@@ -354,16 +362,87 @@ def add_ministries(request):
 
 @login_required
 def create_ministry(request):
-    # TODO: Make this functionality available only to admins
-    if request.method == "POST":
-        form = MinistryForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Ministry Created Successfully")
-            return redirect('list_ministries')
-        else:
-            messages.error(request, "Ministry Creation Failed")
+    if request.method == 'POST':
+        ministry_name = request.POST.get('community_name')
+        leader_names = request.POST.getlist('leaders_name[]')
+        leader_positions = request.POST.getlist('leaders_position[]')
+        leader_phones = request.POST.getlist('leaders_phone[]')
+
+        print(f"DEBUG: Processing {len(leader_names)} leaders for community: {ministry_name}")
+
+        if not ministry_name:
+            messages.error(request, "Ministry name is required")
+            return redirect('add_ministries')
+        
+        if not leader_names or not any(leader_names):
+            messages.error(request, "Please add at least one leader")
+            return redirect('add_ministries')
+        
+        success_count = 0
+        error_messages = []
+
+        try:
+        # Get or create the Community object
+            community, created = Community.objects.get_or_create(name=ministry_name)
+            if created:
+                print(f"DEBUG: Created new community: {ministry_name}")
+            else:
+                print(f"DEBUG: Using existing community: {ministry_name}")
+
+        except Exception as e:
+            messages.error(request, f"Error with community: {str(e)}")
+            return redirect('add_shepherd')
+        
+        # Process each leader
+        for i in range(len(leader_names)):
+        # Skip empty entries
+            if not leader_names[i] or not leader_positions[i]:
+                continue
+            
+            # Check if position already exists in this community
+            existing_leader = CommunityLeader.objects.filter(
+                community_name=community,  # Use the Community object, not string
+                leader=leader_positions[i]
+            ).first()
+            
+            if existing_leader:
+                error_messages.append(
+                    f"Position '{leader_positions[i]}' is already assigned to {existing_leader.name} in {community_name}"
+                )
+                continue
+            
+            try:
+                # Create the leader with Community object
+                leader = CommunityLeader(
+                    community_name=community,  # Pass the Community object
+                    name=leader_names[i],
+                    leader=leader_positions[i],
+                    phone=leader_phones[i] if i < len(leader_phones) else ''
+                )
+                
+                leader.save()
+                success_count += 1
+                print(f"DEBUG: Created leader {leader_names[i]} as {leader_positions[i]}")
+                
+            except Exception as e:
+                error_msg = f"Error creating {leader_names[i]}: {str(e)}"
+                error_messages.append(error_msg)
+                print(f"DEBUG: Exception: {str(e)}")
+        
+        # Display results
+        if success_count > 0:
+            messages.success(request, f"Successfully added {success_count} leader(s) to {community_name}")
+        
+        for error in error_messages:
+            messages.error(request, error)
+        
+        if success_count == 0 and error_messages:
             return redirect('add_ministry')
+        else:
+            return redirect('list_ministries')
+    
+    return redirect('add_ministry')
+
 
 
 @login_required
@@ -670,6 +749,16 @@ def api_edit_ministry(request, pk):
 
 
 # def api_delete_ministry(request, pk):
+def api_delete_ministry(request, pk):
+    if request.method == "POST":
+        ministry = get_object_or_404(Ministry, pk=pk)
+        form = MinistryForm(request.POST or None, instance=ministry)
+        if form.is_valid():
+            form.delete()
+            data = {"STATUS": "OK", "CODE": 0}
+        else:
+            data = {"STATUS": "INVALID", "CODE": -1}
+        return JsonResponse(data, content_type="Application/json", safe=False)
 
 
 

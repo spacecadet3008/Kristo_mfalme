@@ -4,7 +4,7 @@ from .views import (
     table_members, list_members, thumbnail_members, detail_member, edit_member, update_member, restore_member,
     delete_member, filter_members, search_members, get_members_by_statuses, get_members_by_shepherds, list_deleted_members,
     list_ministries, add_ministries, create_ministry,
-    list_shepherds, add_shepherd, create_shepherd,edit_community,delete_community, CreateMembersView,AddMemberView
+    list_shepherds, add_shepherd, create_shepherd,edit_community,delete_community, delete_ministry,CreateMembersView,AddMemberView
 )
 
 urlpatterns = [
@@ -30,10 +30,11 @@ urlpatterns = [
     path('ministries/list/', list_ministries, name="list_ministries"),
     path('ministries/add/', add_ministries, name="add_ministry"),
     path('ministries/create/', create_ministry, name="create_ministry"),
+    path('ministries/delete/<int:pk>/', delete_ministry, name="delete_ministry"),
 
-    # UrlConf For Shepherds
-    path('shepherds/list/', list_shepherds, name="list_shepherds"),
-    path('shepherds/add/', add_shepherd, name="add_shepherd"),
+    # UrlConf For Communities
+    path('shepherds/list/', list_shepherds, name="list_community"),
+    path('shepherds/add/', add_shepherd, name="add_community"),
     path('shepherds/create/', create_shepherd, name="create_shepherd"),
     path('shepherds/edit/<int:community_id>/', edit_community, name="edit_community"),
     path('shepherds/delete/<int:community_id>/', delete_community, name="delete_community"),

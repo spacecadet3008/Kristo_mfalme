@@ -1,60 +1,1043 @@
 {% extends 'base.html' %}
 
+{% block internal_style %}
+    <style>
+        :root {
+            /* Flutter-inspired colors */
+            --primary-color: #2196F3;
+            --primary-dark: #1976D2;
+            --primary-light: #BBDEFB;
+            --secondary-color: #FF9800;
+            --accent-color: #FF5722;
+            --surface-color: #FFFFFF;
+            --background-color: #F5F5F5;
+            --error-color: #F44336;
+            --success-color: #4CAF50;
+            --warning-color: #FFC107;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --text-disabled: #9E9E9E;
+            --divider-color: #E0E0E0;
+            
+            /* Flutter-inspired shadows */
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 20px rgba(0,0,0,0.15);
+            --shadow-xl: 0 20px 40px rgba(0,0,0,0.2);
+            --elevation-1: 0 1px 2px 0 rgba(0,0,0,0.05);
+            --elevation-2: 0 4px 8px -2px rgba(0,0,0,0.1);
+            --elevation-3: 0 12px 24px -4px rgba(0,0,0,0.12);
+            
+            /* Flutter-inspired spacing */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            --space-3xl: 64px;
+            
+            /* Flutter-inspired border radius */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --radius-full: 999px;
+            
+            /* Flutter-inspired transitions */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Page container */
+        .page-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Modern card styling */
+        .modern-card {
+            background: var(--surface-color);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--elevation-2);
+            border: 1px solid var(--divider-color);
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: var(--space-2xl);
+        }
+
+        .modern-card:hover {
+            box-shadow: var(--elevation-3);
+            transform: translateY(-2px);
+        }
+
+        .modern-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
+        /* Modern header styling */
+        .modern-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-xl);
+            border-bottom: 1px solid var(--divider-color);
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .page-title i {
+            color: var(--primary-color);
+        }
+
+        /* Add button */
+        .modern-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            padding: var(--space-md) var(--space-lg);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            text-decoration: none;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modern-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left var(--transition-slow);
+        }
+
+        .modern-button:hover::before {
+            left: 100%;
+        }
+
+        .modern-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modern-button:active {
+            transform: translateY(0);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Table styling */
+        .table-container {
+            padding: var(--space-xl);
+            overflow-x: auto;
+        }
+
+        .modern-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 800px;
+        }
+
+        .modern-table thead {
+            background: linear-gradient(135deg, var(--background-color), #f0f0f0);
+        }
+
+        .modern-table th {
+            padding: var(--space-lg);
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--divider-color);
+            white-space: nowrap;
+        }
+
+        .modern-table tbody tr {
+            transition: all var(--transition-fast);
+            border-bottom: 1px solid var(--divider-color);
+        }
+
+        .modern-table tbody tr:hover {
+            background: linear-gradient(90deg, rgba(33, 150, 243, 0.05), rgba(33, 150, 243, 0.02));
+            transform: translateX(4px);
+        }
+
+        .modern-table td {
+            padding: var(--space-lg);
+            color: var(--text-primary);
+            font-weight: 500;
+            vertical-align: middle;
+        }
+
+        .modern-table td:first-child {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 0.875rem;
+            color: white;
+        }
+
+        .edit-btn {
+            background: linear-gradient(135deg, var(--secondary-color), #FF8F00);
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, var(--error-color), #D32F2F);
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-md);
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Empty state */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-3xl);
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--divider-color);
+            margin-bottom: var(--space-lg);
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: var(--space-sm);
+            color: var(--text-secondary);
+        }
+
+        .empty-state p {
+            margin-bottom: var(--space-xl);
+            max-width: 400px;
+            line-height: 1.6;
+        }
+
+        /* Modern messages styling */
+        .message-container {
+            width: 100%;
+            margin-bottom: var(--space-xl);
+        }
+
+        .modern-message {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            background: var(--surface-color);
+            box-shadow: var(--shadow-md);
+            border-left: 4px solid var(--warning-color);
+            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modern-message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--warning-color), transparent);
+        }
+
+        .modern-message.success {
+            border-left-color: var(--success-color);
+        }
+
+        .modern-message.success::before {
+            background: linear-gradient(90deg, var(--success-color), transparent);
+        }
+
+        .modern-message.error {
+            border-left-color: var(--error-color);
+        }
+
+        .modern-message.error::before {
+            background: linear-gradient(90deg, var(--error-color), transparent);
+        }
+
+        .message-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            flex: 1;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .message-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: var(--space-xs);
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-fast);
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+
+        .message-close:hover {
+            color: var(--text-primary);
+            background: rgba(0,0,0,0.05);
+        }
+
+        /* Delete modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-base);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--surface-color);
+            border-radius: var(--radius-xl);
+            width: 90%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            transform: translateY(20px) scale(0.95);
+            transition: transform var(--transition-base);
+            border: 1px solid var(--divider-color);
+        }
+
+        .modal-overlay.show .modal {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-header {
+            padding: var(--space-xl);
+            border-bottom: 1px solid var(--divider-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .modal-body {
+            padding: var(--space-xl);
+        }
+
+        .modal-body p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .modal-footer {
+            padding: var(--space-xl);
+            border-top: 1px solid var(--divider-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-md);
+        }
+
+        .modal-cancel {
+            padding: var(--space-md) var(--space-lg);
+            background: transparent;
+            border: 1px solid var(--divider-color);
+            color: var(--text-secondary);
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .modal-cancel:hover {
+            background: var(--background-color);
+            color: var(--text-primary);
+        }
+
+        .modal-confirm {
+            padding: var(--space-md) var(--space-lg);
+            background: linear-gradient(135deg, var(--error-color), #D32F2F);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .modal-confirm:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-container {
+                padding: var(--space-lg) var(--space-md);
+            }
+            
+            .modern-header {
+                flex-direction: column;
+                gap: var(--space-lg);
+                align-items: stretch;
+                padding: var(--space-lg);
+            }
+            
+            .page-title {
+                font-size: 1.5rem;
+            }
+            
+            .modern-button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .table-container {
+                padding: var(--space-lg);
+            }
+            
+            .modern-table th,
+            .modern-table td {
+                padding: var(--space-md);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-container {
+                padding: var(--space-md) var(--space-sm);
+            }
+            
+            .modern-card {
+                border-radius: var(--radius-lg);
+            }
+            
+            .page-title {
+                font-size: 1.25rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+                height: 40px;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --surface-color: #1E1E1E;
+                --background-color: #121212;
+                --text-primary: #FFFFFF;
+                --text-secondary: #B0B0B0;
+                --text-disabled: #666666;
+                --divider-color: #333333;
+            }
+            
+            .modern-card {
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            }
+            
+            .modern-table thead {
+                background: linear-gradient(135deg, #2A2A2A, #222);
+            }
+            
+            .modern-table tbody tr:hover {
+                background: linear-gradient(90deg, rgba(33, 150, 243, 0.1), rgba(33, 150, 243, 0.05));
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes rowHighlight {
+            0% {
+                background: rgba(33, 150, 243, 0.1);
+            }
+            100% {
+                background: transparent;
+            }
+        }
+
+        /* Loading skeleton */
+        .skeleton-row {
+            animation: skeleton-loading 1.5s ease-in-out infinite;
+        }
+
+        @keyframes skeleton-loading {
+            0% {
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Scrollbar styling */
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: var(--background-color);
+            border-radius: var(--radius-full);
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: var(--divider-color);
+            border-radius: var(--radius-full);
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: var(--text-disabled);
+        }
+
+        /* Print styles */
+        @media print {
+            .modern-button,
+            .action-buttons,
+            .message-close {
+                display: none;
+            }
+            
+            .modern-card {
+                box-shadow: none;
+                border: 1px solid var(--divider-color);
+            }
+        }
+
+        /* High contrast mode */
+        @media (prefers-contrast: high) {
+            .modern-card {
+                border: 2px solid var(--text-primary);
+            }
+            
+            .modern-table th {
+                border-bottom: 2px solid var(--text-primary);
+            }
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+{% endblock internal_style %}
+
 {% block content %}
-    <div class="dashboard-wrapper">
-        <div class="container-fluid dashboard-content">
-            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-5">
+    <div class="page-container">
+        <!-- Messages -->
         {% if messages %}
-            {% for message in messages %}
-                <div class="col-lg-12 mr-auto ml-auto alert bg-warning alert-dismissable pb-0 pt-0" role="alert">
-                    <button type="button" class="close p-2" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true" class="text-light font-weight-bold"><b>&times;</b></span>
-                    </button>
-                    <div class="row">
-                        <div class="mr-auto ml-auto">
-                        <p class="h5 mr-auto ml-auto p-2 text-light">
-                             <b>
-                                {% if message.tags ==  "alert-danger" %}
-                                    <i class="fa fa-exclamation-triangle mr-3 text-danger"></i> {{ message }}
-                                {% else %}
-                                    <i class="fa fa-check"></i> {{ message }}
-                                {% endif %}
-                            </b>
-                        </p>
+            <div class="message-container">
+                {% for message in messages %}
+                    <div class="modern-message {% if message.tags %}{{ message.tags }}{% endif %}" role="alert">
+                        <div class="message-icon">
+                            {% if message.tags == "error" or message.tags == "alert-danger" %}
+                                <i class="fas fa-exclamation-triangle" style="color: var(--error-color);"></i>
+                            {% elif message.tags == "success" %}
+                                <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle" style="color: var(--warning-color);"></i>
+                            {% endif %}
+                        </div>
+                        <div class="message-content">
+                            {{ message }}
+                        </div>
+                        <button class="message-close" aria-label="Close message">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
-                    </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         {% endif %}
-            <div class="card mb-5">
-                <h5 class="card-header">Ministries Table <a href="{% url 'add_ministry' %}" class="btn btn-sm btn-success shadow float-right text-light">Add Ministry <i class="fa fa-plus ml-2"></i></a>
-</h5>
-                <div class="card-body mb-5">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-bordered first">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Description</th>
-                                    <th>Leader</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+
+        <!-- Main Card -->
+        <div class="modern-card">
+            <!-- Header with title and add button -->
+            <div class="modern-header">
+                <h1 class="page-title">
+                    <i class="fas fa-building"></i>
+                    Ministries
+                </h1>
+                <a href="{% url 'add_ministry' %}" class="modern-button">
+                    <i class="fas fa-plus"></i>
+                    Add Ministry
+                </a>
+            </div>
+
+            <!-- Table Container -->
+            <div class="table-container">
+                {% if ministries %}
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Leader</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             {% for ministry in ministries %}
-                                <tr>
-                                    <td>{{ ministry.name }}</td>
-                                    <td>{{ ministry.description }}</td>
-                                    <td>{{ ministry.leader }}</td>
+                                <tr id="ministry-{{ ministry.id }}">
+                                    <td>
+                                        <div class="ministry-name">
+                                            <strong>{{ ministry.name }}</strong>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="ministry-description">
+                                            {{ ministry.description|truncatechars:100 }}
+                                            {% if ministry.description|length > 100 %}
+                                                <span class="text-secondary">...</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="ministry-leader">
+                                            {% if ministry.leader %}
+                                                <span class="leader-badge">
+                                                    <i class="fas fa-user-tie" style="margin-right: var(--space-xs);"></i>
+                                                    {{ ministry.leader }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-secondary">No leader assigned</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <!-- Edit button -->
+                                            <a href="" 
+                                               class="action-btn edit-btn"
+                                               title="Edit Ministry"
+                                               aria-label="Edit {{ ministry.name }}">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            
+                                            <!-- Delete button -->
+                                            <button class="action-btn delete-btn"
+                                                    data-ministry-id="{{ ministry.id }}"
+                                                    data-ministry-name="{{ ministry.name }}"
+                                                    title="Delete Ministry"
+                                                    aria-label="Delete {{ ministry.name }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
                                 </tr>
                             {% endfor %}
-                            </tbody>
-                        </table>
+                        </tbody>
+                    </table>
+                {% else %}
+                    <!-- Empty state -->
+                    <div class="empty-state">
+                        <i class="fas fa-building"></i>
+                        <h3>No Ministries Found</h3>
+                        <p>Get started by adding your first ministry to organize and manage church activities.</p>
+                        <a href="{% url 'add_ministry' %}" class="modern-button">
+                            <i class="fas fa-plus"></i>
+                            Add Your First Ministry
+                        </a>
                     </div>
-                </div>
+                {% endif %}
             </div>
-     </div>
         </div>
+    </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-exclamation-triangle" style="color: var(--error-color);"></i>
+                    Delete Ministry
+                </h3>
+                <button class="message-close close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteMessage">
+                    Are you sure you want to delete this ministry? This action cannot be undone.
+                </p>
+                <p class="text-secondary">
+                    <small>All associated data will be permanently removed.</small>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-cancel" id="cancelDelete">
+                    Cancel
+                </button>
+                <form method="post" action="{% url 'delete_ministry' 0 %}" id="deleteForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="ministry_id" id="deleteMinistryId">
+                    <button type="submit" class="modal-confirm">
+                        <i class="fas fa-trash" style="margin-right: var(--space-xs);"></i>
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock content %}
 
-{% block footer %}{% endblock footer %}
+{% block script %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const deleteModal = document.getElementById('deleteModal');
+            const deleteForm = document.getElementById('deleteForm');
+            const deleteMessage = document.getElementById('deleteMessage');
+            const deleteMinistryId = document.getElementById('deleteMinistryId');
+            const cancelDelete = document.getElementById('cancelDelete');
+            const closeModalButtons = document.querySelectorAll('.close-modal');
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+            const messageCloseButtons = document.querySelectorAll('.message-close');
+            
+            // Close message buttons
+            messageCloseButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const message = this.closest('.modern-message');
+                    if (message) {
+                        message.style.animation = 'slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) reverse';
+                        setTimeout(() => {
+                            message.style.display = 'none';
+                        }, 300);
+                    }
+                });
+            });
+            
+            // Auto-hide messages after 5 seconds
+            const messages = document.querySelectorAll('.modern-message');
+            messages.forEach(message => {
+                setTimeout(() => {
+                    message.style.opacity = '0';
+                    message.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                        message.style.display = 'none';
+                    }, 300);
+                }, 5000);
+            });
+            
+            // Delete button click handlers
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const ministryId = this.dataset.ministryId;
+                    const ministryName = this.dataset.ministryName;
+                    
+                    // Update modal message
+                    deleteMessage.textContent = `Are you sure you want to delete "${ministryName}"? This action cannot be undone.`;
+                    deleteMinistryId.value = ministryId;
+                    
+                    // Update form action URL
+                    deleteForm.action = deleteForm.action.replace('/0/', `/${ministryId}/`);
+                    
+                    // Show modal
+                    deleteModal.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+            
+            // Close modal
+            function closeModal() {
+                deleteModal.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+            
+            // Cancel delete
+            if (cancelDelete) {
+                cancelDelete.addEventListener('click', closeModal);
+            }
+            
+            // Close modal buttons
+            closeModalButtons.forEach(button => {
+                button.addEventListener('click', closeModal);
+            });
+            
+            // Close modal when clicking outside
+            deleteModal.addEventListener('click', function(e) {
+                if (e.target === deleteModal) {
+                    closeModal();
+                }
+            });
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Escape to close modal
+                if (e.key === 'Escape' && deleteModal.classList.contains('show')) {
+                    closeModal();
+                }
+                
+                // Ctrl+F to focus search (if implemented later)
+                if (e.ctrlKey && e.key === 'f') {
+                    e.preventDefault();
+                    // Focus search input if exists
+                    const searchInput = document.querySelector('input[type="search"]');
+                    if (searchInput) searchInput.focus();
+                }
+            });
+            
+            // Form submission loading state
+            if (deleteForm) {
+                deleteForm.addEventListener('submit', function(e) {
+                    const submitBtn = this.querySelector('.modal-confirm');
+                    const originalText = submitBtn.innerHTML;
+                    
+                    // Show loading state
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                    submitBtn.style.opacity = '0.7';
+                    
+                    // The form will submit normally, no need for fetch unless doing AJAX
+                });
+            }
+            
+            // Row highlight on hover
+            const tableRows = document.querySelectorAll('.modern-table tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+                });
+                
+                // Add click animation
+                row.addEventListener('click', function(e) {
+                    if (!e.target.closest('.action-btn')) {
+                        this.style.animation = 'rowHighlight 0.3s ease';
+                        setTimeout(() => {
+                            this.style.animation = '';
+                        }, 300);
+                    }
+                });
+            });
+            
+            // Touch device optimizations
+            if ('ontouchstart' in window) {
+                // Increase tap targets for mobile
+                const actionButtons = document.querySelectorAll('.action-btn');
+                actionButtons.forEach(btn => {
+                    btn.style.minWidth = '44px';
+                    btn.style.minHeight = '44px';
+                });
+                
+                // Prevent accidental horizontal scroll on table
+                let startX;
+                const tableContainer = document.querySelector('.table-container');
+                
+                if (tableContainer) {
+                    tableContainer.addEventListener('touchstart', function(e) {
+                        startX = e.touches[0].clientX;
+                    });
+                    
+                    tableContainer.addEventListener('touchmove', function(e) {
+                        const currentX = e.touches[0].clientX;
+                        const diffX = Math.abs(startX - currentX);
+                        
+                        // If vertical scroll is significant, prevent horizontal scroll
+                        if (diffX > 10) {
+                            e.preventDefault();
+                        }
+                    }, { passive: false });
+                }
+            }
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+            
+            // Add CSS for animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes pulse {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.05); }
+                    100% { transform: scale(1); }
+                }
+                
+                .leader-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    padding: var(--space-xs) var(--space-sm);
+                    background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(255, 152, 0, 0.05));
+                    border-radius: var(--radius-sm);
+                    color: var(--secondary-color);
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                }
+                
+                /* Loading animation for delete */
+                .fa-spinner {
+                    animation: spin 1s linear infinite;
+                }
+                
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Search functionality (if needed in future)
+            function setupSearch() {
+                const searchInput = document.createElement('input');
+                searchInput.type = 'search';
+                searchInput.placeholder = 'Search ministries...';
+                searchInput.className = 'search-input';
+                searchInput.style.cssText = `
+                    padding: var(--space-md) var(--space-lg);
+                    border: 2px solid var(--divider-color);
+                    border-radius: var(--radius-lg);
+                    font-size: 0.875rem;
+                    width: 100%;
+                    margin-bottom: var(--space-lg);
+                    transition: all var(--transition-fast);
+                `;
+                
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const rows = document.querySelectorAll('.modern-table tbody tr');
+                    
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        if (text.includes(searchTerm)) {
+                            row.style.display = '';
+                            row.style.animation = 'pulse 0.3s ease';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+                
+                const header = document.querySelector('.modern-header');
+                if (header) {
+                    header.insertAdjacentElement('afterend', searchInput);
+                }
+            }
+            
+            // Uncomment to enable search
+            // setupSearch();
+        });
+    </script>
+{% endblock script %}

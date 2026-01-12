@@ -35,12 +35,12 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 
-ALLOWED_HOSTS = [
+"""ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '.onrender.com',  # Allow all Render subdomains 
 ]
-
+"""
 
 # Application definition
 
@@ -55,6 +55,16 @@ INSTALLED_APPS = [
     'users',
     'phonenumber_field',
     'tithe',
+    'notification',
+    'rest_framework',
+]
+
+LOGIN_URL = 'login_user'  
+LOGIN_REDIRECT_URL = 'home' 
+LOGOUT_REDIRECT_URL = 'login_user'  
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 MIDDLEWARE = [
@@ -66,6 +76,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    #'users.middleware.ForcePasswordChangeMiddleware',
 ]
 
 ROOT_URLCONF = 'christ_king_church.urls'
@@ -142,6 +153,7 @@ LANGUAGES = [
     ('sw', 'Swahili'),
 ]
 
+AUTH_USER_MODEL = 'users.User'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
@@ -181,6 +193,11 @@ NEXTSMS_API_KEY = 'your_nextsms_api_key'
 NEXTSMS_API_SECRET = 'your_nextsms_api_secret'
 NEXTSMS_SENDER_ID = 'your_sender_id'
 
+#Beem africa configuration
+BEEM_API_KEY = os.getenv('BEEM_API_KEY')
+BEEM_SECRET_KEY = os.getenv('BEEM_SECRET_KEY')
+BEEM_SENDER_NAME = os.getenv('BEEM_SENDER_NAME')    
+
 # Choose which provider to use
-SMS_PROVIDER = 'africastalking'  # Change to 'nextsms' when ready
+SMS_PROVIDER = 'beem_africa'  # Change to 'nextsms' when ready
 SEND_SMS_ENABLED = True

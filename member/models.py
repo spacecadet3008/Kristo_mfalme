@@ -25,11 +25,16 @@ class Ministry(models.Model):
         ('VICE CHAIR','vice chair'),
         ('SECRETARY','secretary'),
         ('VICE SECRETARY','vice secretary'),
-        ('ACCOUNTANT', 'accountant')
+        ('ACCOUNTANT', 'accountant'),
+        ('COORDINATOR','coordinator')
     ]
     name = models.CharField(max_length=255)
-    description = models.TextField()
-    leader = models.CharField(max_length=255, choices=rank, null=True)
+    description = models.OneToOneField("Community", verbose_name="Community", on_delete=models.CASCADE, related_name="Community_member", null=True, blank=True)
+    feast_name = models.TextField(max_length='10',blank=True, null=True )
+    feast_date = models.DateField(blank=True, null=True)
+    #leader = models.OneToOneField("Member", on_delete=models.CASCADE,related_name='leader', blank=True, null=True)
+    leader = models.CharField(max_length=250, null=True, blank=True)
+    position = models.CharField(max_length=30,choices=rank,null=True, blank=True)
     phone = PhoneNumberField(max_length=255, null=True)
 
     def __str__(self):
@@ -45,7 +50,6 @@ class Community(models.Model):
 
 class CommunityLeader(models.Model):
     RANK_CHOICES = [
-        ('CHAIR PERSON','chair person'),
         ('VICE CHAIR', 'Vice Chair'),
         ('SECRETARY', 'Secretary'),
         ('VICE SECRETARY', 'Vice Secretary'),
@@ -55,15 +59,18 @@ class CommunityLeader(models.Model):
     
     community_name = models.ForeignKey(Community, on_delete=models.CASCADE, related_name='leaders', null=True)
     name = models.CharField(max_length=250 , null=True)
-    leader = models.CharField(max_length=255, choices=RANK_CHOICES, null=True)
-    description = models.TextField(blank=True)
+    #leader = models.OneToOneField("Member", on_delete=models.CASCADE,related_name='supervisor',choices=RANK_CHOICES ,blank=True, null=True)
+    leader = models.CharField(max_length=250, null=True, blank=True)
+    description = models.TextField(blank=True, null=True )
+    feast_name = models.TextField(max_length='10',blank=True, null=True )
+    feast_date = models.DateField(blank=True, null=True)
     phone = PhoneNumberField(max_length=255,blank=True, null=True)
     
     class Meta:
         unique_together = ['community_name', 'leader']  # Prevent duplicate positions in same community
     
     def __str__(self):
-        return f"{self.name} - {self.leader} ({self.community_name.name})"
+        return f"{self.name} - {self.leader} {self.feast_date} {self.feast_name} ({self.community_name.name})"
 
 
 class MemberManager(models.Manager):
@@ -113,6 +120,8 @@ class Member(models.Model):
     working = models.BooleanField(default=False)
     schooling = models.BooleanField(default=False)
     picture = models.ImageField(upload_to=upload_image_path, null=True, blank=True)
+    transfered = models.BooleanField(max_length=250, blank=True, null= True)
+    transfer_update = models.CharField(max_length=250, null=True, blank=True)
 
     objects = MemberManager()
 

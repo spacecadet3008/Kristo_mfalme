@@ -27,6 +27,7 @@ urlpatterns = [
     path('members/', include('member.urls')),
     path('accounts/', include('users.urls')),
     path('tithe/', include('tithe.urls')),
+    path('notifications/', include('notification.urls')),
     path('', index, name="home"),
 ]
 

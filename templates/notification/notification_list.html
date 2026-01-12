@@ -1,0 +1,716 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Notifications - MyApp{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Custom styles for notifications */
+    .notification-item {
+        transition: all 0.2s ease;
+    }
+    
+    .notification-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .notification-unread {
+        border-left: 4px solid #3b82f6;
+        background-color: #eff6ff;
+    }
+    
+    .notification-read {
+        border-left: 4px solid #d1d5db;
+    }
+    
+    .notification-urgent {
+        border-left: 4px solid #ef4444;
+    }
+    
+    .notification-type-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+    }
+    
+    /* Animation for marking as read */
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0.5; }
+    }
+    
+    .marking-as-read {
+        animation: fadeOut 0.3s ease;
+    }
+    
+    /* Responsive table styles */
+    @media (max-width: 768px) {
+        .notification-table-header {
+            display: none;
+        }
+        
+        .notification-card {
+            display: block;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="px-4 sm:px-0 mb-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Notifications</h1>
+                    <p class="mt-2 text-sm text-gray-600">
+                        {% if filter_type == 'unread' %}
+                            Showing {{ notifications.paginator.count }} unread notification{{ notifications.paginator.count|pluralize }}
+                        {% elif filter_type == 'read' %}
+                            Showing {{ notifications.paginator.count }} read notification{{ notifications.paginator.count|pluralize }}
+                        {% else %}
+                            {{ notifications.paginator.count }} total notification{{ notifications.paginator.count|pluralize }}
+                        {% endif %}
+                        {% if notification_type %}
+                            of type "{{ notification_type }}"
+                        {% endif %}
+                    </p>
+                </div>
+                
+                <div class="mt-4 sm:mt-0 flex space-x-3">
+                    {% if unread_count > 0 %}
+                    <form method="POST" action="{% url 'mark-all-read' %}" class="mark-all-form">
+                        {% csrf_token %}
+                        <button type="submit" 
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-check-double mr-2"></i>
+                            Mark all as read
+                        </button>
+                    </form>
+                    {% endif %}
+                    
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" 
+                                class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-filter mr-2"></i>
+                            Filter
+                            <i class="fas fa-chevron-down ml-2"></i>
+                        </button>
+                        
+                        <div x-show="open" 
+                             @click.away="open = false"
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                            <div class="py-1">
+                                <a href="?filter=all" 
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {% if filter_type == 'all' %}bg-blue-50 text-blue-700{% endif %}">
+                                    <i class="fas fa-inbox mr-2"></i>All notifications
+                                </a>
+                                <a href="?filter=unread" 
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {% if filter_type == 'unread' %}bg-blue-50 text-blue-700{% endif %}">
+                                    <i class="fas fa-envelope mr-2"></i>Unread only
+                                </a>
+                                <a href="?filter=read" 
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {% if filter_type == 'read' %}bg-blue-50 text-blue-700{% endif %}">
+                                    <i class="fas fa-envelope-open mr-2"></i>Read only
+                                </a>
+                                
+                                <div class="border-t border-gray-100"></div>
+                                
+                                <div class="px-4 py-2">
+                                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">By Type</p>
+                                    {% for type_key, type_label in notification_types %}
+                                    <a href="?type={{ type_key }}" 
+                                       class="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded {% if request.GET.type == type_key %}bg-blue-50 text-blue-700{% endif %}">
+                                        {{ type_label }}
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-3">
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <dt class="text-sm font-medium text-gray-500 truncate">
+                            <i class="fas fa-envelope mr-2"></i>Total Notifications
+                        </dt>
+                        <dd class="mt-1 text-3xl font-semibold text-gray-900">
+                            {{ notifications.paginator.count }}
+                        </dd>
+                    </div>
+                </div>
+                
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <dt class="text-sm font-medium text-gray-500 truncate">
+                            <i class="fas fa-envelope mr-2"></i>Unread
+                        </dt>
+                        <dd class="mt-1 text-3xl font-semibold text-blue-600">
+                            {{ unread_count }}
+                        </dd>
+                    </div>
+                </div>
+                
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <dt class="text-sm font-medium text-gray-500 truncate">
+                            <i class="fas fa-check-circle mr-2"></i>Read
+                        </dt>
+                        <dd class="mt-1 text-3xl font-semibold text-green-600">
+                            {{ notifications.paginator.count|add:"-"|add:unread_count }}
+                        </dd>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Notifications List -->
+        <div class="mt-8">
+            {% if notifications %}
+                <!-- Desktop Table View -->
+                <div class="hidden md:block bg-white shadow overflow-hidden sm:rounded-md">
+                    <ul class="divide-y divide-gray-200">
+                        {% for notification in notifications %}
+                        <li class="notification-item {% if not notification.is_read %}notification-unread{% else %}notification-read{% endif %}">
+                            <div class="px-4 py-4 sm:px-6">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center">
+                                            {% if not notification.is_read %}
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-3">
+                                                <i class="fas fa-circle text-xs mr-1"></i>New
+                                            </span>
+                                            {% endif %}
+                                            
+                                            <span class="notification-type-badge {% if notification.notification_type == 'urgent' %}bg-red-100 text-red-800{% elif notification.notification_type == 'warning' %}bg-yellow-100 text-yellow-800{% else %}bg-blue-100 text-blue-800{% endif %} mr-3">
+                                                {{ notification.get_notification_type_display }}
+                                            </span>
+                                            
+                                            <p class="text-sm font-medium text-gray-900 truncate">
+                                                {{ notification.title }}
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="mt-2">
+                                            <p class="text-sm text-gray-600">
+                                                {{ notification.message|truncatewords:30 }}
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="mt-2 flex items-center text-sm text-gray-500">
+                                            <i class="far fa-clock mr-1"></i>
+                                            <time datetime="{{ notification.created_at|date:'c' }}">
+                                                {{ notification.created_at|timesince }} ago
+                                            </time>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center space-x-3">
+                                        {% if notification.action_url %}
+                                        <a href="{{ notification.action_url }}" 
+                                           class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                            <i class="fas fa-external-link-alt mr-1"></i> View
+                                        </a>
+                                        {% endif %}
+                                        
+                                        <form method="POST" action="{% url 'mark-as-read' notification.pk %}" class="mark-read-form">
+                                            {% csrf_token %}
+                                            <button type="submit" 
+                                                    class="inline-flex items-center px-3 py-1 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                                    {% if notification.is_read %}disabled title="Already read"{% endif %}>
+                                                <i class="fas fa-check mr-1"></i>
+                                                {% if notification.is_read %}Read{% else %}Mark as read{% endif %}
+                                            </button>
+                                        </form>
+                                        
+                                        <form method="POST" action="{% url 'delete-notification' notification.pk %}" class="delete-form">
+                                            {% csrf_token %}
+                                            <button type="submit" 
+                                                    class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 delete-notification-btn">
+                                                <i class="fas fa-trash mr-1"></i> Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    
+                    <!-- Pagination -->
+                    {% if notifications.has_other_pages %}
+                    <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1 flex justify-between sm:hidden">
+                                {% if notifications.has_previous %}
+                                <a href="?page={{ notifications.previous_page_number }}{% if filter_type %}&filter={{ filter_type }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}" 
+                                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                    Previous
+                                </a>
+                                {% endif %}
+                                
+                                {% if notifications.has_next %}
+                                <a href="?page={{ notifications.next_page_number }}{% if filter_type %}&filter={{ filter_type }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}" 
+                                   class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                    Next
+                                </a>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-700">
+                                        Showing page <span class="font-medium">{{ notifications.number }}</span> of
+                                        <span class="font-medium">{{ notifications.paginator.num_pages }}</span>
+                                    </p>
+                                </div>
+                                
+                                <div>
+                                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                        {% if notifications.has_previous %}
+                                        <a href="?page={{ notifications.previous_page_number }}{% if filter_type %}&filter={{ filter_type }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}" 
+                                           class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                            <span class="sr-only">Previous</span>
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                        {% endif %}
+                                        
+                                        {% for num in notifications.paginator.page_range %}
+                                            {% if notifications.number == num %}
+                                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600">
+                                                {{ num }}
+                                            </span>
+                                            {% elif num > notifications.number|add:'-3' and num < notifications.number|add:'3' %}
+                                            <a href="?page={{ num }}{% if filter_type %}&filter={{ filter_type }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}" 
+                                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                                {{ num }}
+                                            </a>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {% if notifications.has_next %}
+                                        <a href="?page={{ notifications.next_page_number }}{% if filter_type %}&filter={{ filter_type }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}" 
+                                           class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                            <span class="sr-only">Next</span>
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                        {% endif %}
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Mobile Card View -->
+                <div class="md:hidden space-y-4">
+                    {% for notification in notifications %}
+                    <div class="notification-card {% if not notification.is_read %}notification-unread{% else %}notification-read{% endif %}">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                {% if not notification.is_read %}
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-2">
+                                    <i class="fas fa-circle text-xs mr-1"></i>New
+                                </span>
+                                {% endif %}
+                                
+                                <span class="notification-type-badge {% if notification.notification_type == 'urgent' %}bg-red-100 text-red-800{% elif notification.notification_type == 'warning' %}bg-yellow-100 text-yellow-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                                    {{ notification.get_notification_type_display }}
+                                </span>
+                            </div>
+                            
+                            <span class="text-xs text-gray-500">
+                                <i class="far fa-clock mr-1"></i>
+                                {{ notification.created_at|timesince }} ago
+                            </span>
+                        </div>
+                        
+                        <h3 class="text-sm font-semibold text-gray-900 mb-2">{{ notification.title }}</h3>
+                        <p class="text-sm text-gray-600 mb-4">{{ notification.message|truncatewords:20 }}</p>
+                        
+                        <div class="flex flex-wrap gap-2">
+                            {% if notification.action_url %}
+                            <a href="{{ notification.action_url }}" 
+                               class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200">
+                                <i class="fas fa-external-link-alt mr-1"></i> View
+                            </a>
+                            {% endif %}
+                            
+                            <form method="POST" action="{% url 'mark-as-read' notification.pk %}" class="mark-read-form">
+                                {% csrf_token %}
+                                <button type="submit" 
+                                        class="inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                        {% if notification.is_read %}disabled title="Already read"{% endif %}>
+                                    <i class="fas fa-check mr-1"></i>
+                                    {% if notification.is_read %}Read{% else %}Mark read{% endif %}
+                                </button>
+                            </form>
+                            
+                            <form method="POST" action="{% url 'delete-notification' notification.pk %}" class="delete-form">
+                                {% csrf_token %}
+                                <button type="submit" 
+                                        class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 delete-notification-btn">
+                                    <i class="fas fa-trash mr-1"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <!-- Mobile Pagination -->
+                    {% if notifications.has_other_pages %}
+                    <div class="flex justify-between items-center mt-4">
+                        {% if notifications.has_previous %}
+                        <a href="?page={{ notifications.previous_page_number }}{% if filter_type %}&filter={{ filter_type }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}" 
+                           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            <i class="fas fa-chevron-left mr-2"></i> Previous
+                        </a>
+                        {% endif %}
+                        
+                        <span class="text-sm text-gray-500">
+                            Page {{ notifications.number }} of {{ notifications.paginator.num_pages }}
+                        </span>
+                        
+                        {% if notifications.has_next %}
+                        <a href="?page={{ notifications.next_page_number }}{% if filter_type %}&filter={{ filter_type }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}" 
+                           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Next <i class="fas fa-chevron-right ml-2"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+            {% else %}
+                <!-- Empty State -->
+                <div class="text-center py-12">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                        <i class="fas fa-bell text-gray-400 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">No notifications</h3>
+                    <p class="text-gray-500 max-w-md mx-auto">
+                        {% if filter_type == 'unread' %}
+                        You don't have any unread notifications. Great job staying on top of things!
+                        {% elif filter_type == 'read' %}
+                        You haven't read any notifications yet.
+                        {% else %}
+                        You're all caught up! No notifications to display.
+                        {% endif %}
+                    </p>
+                    <div class="mt-6">
+                        <a href="?filter=all" 
+                           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-inbox mr-2"></i> View all notifications
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+// Add Alpine.js for dropdown
+document.addEventListener('alpine:init', () => {
+    Alpine.data('notification', () => ({
+        open: false,
+        init() {
+            // Initialize any notification-specific Alpine.js functionality
+        }
+    }));
+});
+
+// AJAX for marking as read
+document.querySelectorAll('.mark-read-form').forEach(form => {
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const notificationItem = this.closest('.notification-item') || this.closest('.notification-card');
+        const markButton = this.querySelector('button');
+        
+        // Disable button and show loading state
+        markButton.disabled = true;
+        markButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Marking...';
+        
+        try {
+            const response = await fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': this.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                // Visual feedback
+                notificationItem.classList.add('marking-as-read');
+                notificationItem.classList.remove('notification-unread');
+                notificationItem.classList.add('notification-read');
+                
+                // Remove "New" badge if exists
+                const newBadge = notificationItem.querySelector('.bg-blue-100.text-blue-800');
+                if (newBadge) {
+                    newBadge.remove();
+                }
+                
+                // Update button
+                markButton.innerHTML = '<i class="fas fa-check mr-1"></i> Read';
+                markButton.classList.remove('border-gray-300', 'text-gray-700', 'hover:bg-gray-50');
+                markButton.classList.add('border-transparent', 'text-gray-400', 'cursor-default');
+                
+                // Update unread count in header if exists
+                const unreadBadge = document.querySelector('.unread-count-badge');
+                if (unreadBadge) {
+                    const currentCount = parseInt(unreadBadge.textContent);
+                    if (currentCount > 0) {
+                        unreadBadge.textContent = currentCount - 1;
+                        if (currentCount - 1 === 0) {
+                            unreadBadge.style.display = 'none';
+                        }
+                    }
+                }
+                
+                // Update stats cards
+                updateStatsCounts(-1);
+                
+            } else {
+                alert('Failed to mark notification as read');
+                markButton.disabled = false;
+                markButton.innerHTML = '<i class="fas fa-check mr-1"></i> Mark as read';
+            }
+            
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred');
+            markButton.disabled = false;
+            markButton.innerHTML = '<i class="fas fa-check mr-1"></i> Mark as read';
+        }
+    });
+});
+
+// AJAX for deleting notifications
+document.querySelectorAll('.delete-form').forEach(form => {
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        if (!confirm('Are you sure you want to delete this notification?')) {
+            return;
+        }
+        
+        const notificationItem = this.closest('.notification-item') || this.closest('.notification-card');
+        const deleteButton = this.querySelector('button');
+        
+        // Disable button and show loading state
+        deleteButton.disabled = true;
+        deleteButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Deleting...';
+        
+        try {
+            const response = await fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': this.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                // Fade out and remove notification
+                notificationItem.style.opacity = '0.5';
+                notificationItem.style.transform = 'translateX(-20px)';
+                
+                setTimeout(() => {
+                    notificationItem.remove();
+                    
+                    // Check if list is now empty
+                    const notificationsList = document.querySelector('.divide-y') || document.querySelector('.space-y-4');
+                    if (notificationsList && notificationsList.children.length === 0) {
+                        showEmptyState();
+                    }
+                    
+                    // Update stats
+                    updateStatsCounts(0, -1); // Decrease total by 1
+                    
+                }, 300);
+                
+            } else {
+                alert('Failed to delete notification');
+                deleteButton.disabled = false;
+                deleteButton.innerHTML = '<i class="fas fa-trash mr-1"></i> Delete';
+            }
+            
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred');
+            deleteButton.disabled = false;
+            deleteButton.innerHTML = '<i class="fas fa-trash mr-1"></i> Delete';
+        }
+    });
+});
+
+// AJAX for marking all as read
+document.querySelectorAll('.mark-all-form').forEach(form => {
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        if (!confirm('Are you sure you want to mark all notifications as read?')) {
+            return;
+        }
+        
+        const markAllButton = this.querySelector('button');
+        const originalText = markAllButton.innerHTML;
+        
+        // Disable button and show loading state
+        markAllButton.disabled = true;
+        markAllButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Marking all...';
+        
+        try {
+            const response = await fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': this.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                // Update all notification items
+                document.querySelectorAll('.notification-unread').forEach(item => {
+                    item.classList.remove('notification-unread');
+                    item.classList.add('notification-read');
+                    item.classList.add('marking-as-read');
+                    
+                    // Remove "New" badges
+                    const newBadges = item.querySelectorAll('.bg-blue-100.text-blue-800');
+                    newBadges.forEach(badge => badge.remove());
+                    
+                    // Update buttons
+                    const markButtons = item.querySelectorAll('.mark-read-form button');
+                    markButtons.forEach(button => {
+                        button.innerHTML = '<i class="fas fa-check mr-1"></i> Read';
+                        button.disabled = true;
+                        button.classList.remove('border-gray-300', 'text-gray-700', 'hover:bg-gray-50');
+                        button.classList.add('border-transparent', 'text-gray-400', 'cursor-default');
+                    });
+                });
+                
+                // Update unread count badge
+                const unreadBadge = document.querySelector('.unread-count-badge');
+                if (unreadBadge) {
+                    unreadBadge.style.display = 'none';
+                }
+                
+                // Update stats
+                updateStatsCounts(-data.count, 0, data.count); // Set unread to 0, increase read by count
+                
+                // Show success message
+                showToast(`Successfully marked ${data.count} notifications as read`, 'success');
+                
+            } else {
+                alert('Failed to mark all notifications as read');
+            }
+            
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred');
+        } finally {
+            markAllButton.disabled = false;
+            markAllButton.innerHTML = originalText;
+        }
+    });
+});
+
+// Helper functions
+function updateStatsCounts(unreadChange = 0, totalChange = 0, readChange = 0) {
+    // Update unread count in stats card
+    const unreadStat = document.querySelector('dd.text-blue-600');
+    if (unreadStat) {
+        let current = parseInt(unreadStat.textContent.replace(/,/g, ''));
+        current = Math.max(0, current + unreadChange);
+        unreadStat.textContent = current.toLocaleString();
+    }
+    
+    // Update read count in stats card
+    const readStat = document.querySelector('dd.text-green-600');
+    if (readStat) {
+        let current = parseInt(readStat.textContent.replace(/,/g, ''));
+        current = Math.max(0, current + readChange);
+        readStat.textContent = current.toLocaleString();
+    }
+    
+    // Update total count in stats card
+    const totalStat = document.querySelector('dd.text-gray-900');
+    if (totalStat) {
+        let current = parseInt(totalStat.textContent.replace(/,/g, ''));
+        current = Math.max(0, current + totalChange);
+        totalStat.textContent = current.toLocaleString();
+    }
+}
+
+function showEmptyState() {
+    // You can implement this to show an empty state message
+    // if all notifications are deleted
+}
+
+function showToast(message, type = 'success') {
+    // Simple toast notification
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 px-6 py-3 rounded-md shadow-lg text-white ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} z-50`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+// Real-time updates (optional - using WebSockets or polling)
+// Uncomment and implement if you want real-time notification updates
+/*
+function startNotificationPolling() {
+    setInterval(async () => {
+        try {
+            const response = await fetch('/notifications/unread-count/');
+            const data = await response.json();
+            
+            const currentUnread = parseInt(document.querySelector('.unread-count-badge')?.textContent || '0');
+            if (data.unread_count !== currentUnread) {
+                // Refresh the page or update UI
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error('Polling error:', error);
+        }
+    }, 30000); // Poll every 30 seconds
+}
+
+// Start polling when page loads
+document.addEventListener('DOMContentLoaded', startNotificationPolling);
+*/
+</script>
+{% endblock %}

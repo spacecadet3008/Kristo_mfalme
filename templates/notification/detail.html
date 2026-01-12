@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}
+Notification Details
+{% endblock title %}
+
+{% block internal_style %}
+
+{% endblock internal_style %}
+
+{% block contents %}
+<div class ="header-1">
+    <div class = "header-detail">
+        <!-- Back button-->
+         <div class = "button">
+            <a href = "{% url "notification-list" %}" class="button-back">
+                <i class="fas fa-arrow-left"></i>
+                back to notification
+            </a>
+         </div>
+
+         <!--Notification Card-->
+         <div class="notification-card">
+            <div class="notification-header">
+                <div class="notification-header1">
+                    <div>
+                        <div class="header-options">
+                            {% if not notification.is_read %}
+                           <span class="time">
+                            <i class="fas fa-circle"></i>New
+                           </span> 
+                            {% endif %}
+
+                            <span>
+                                {% if notification.notification_type == 'urgent' %}{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+         </div>
+    </div>
+</div>
+{% endblock contents %}

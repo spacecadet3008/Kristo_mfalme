@@ -1,12 +1,13 @@
 from django.conf import settings
 from .sms_api.africastalking import AfricaTalkingProvider
+from .sms_api.BeemAfrica import BeemAfrica
 
 class SMSService:
     def __init__(self):
-        self.provider = AfricaTalkingProvider(
-            username=settings.AFRICASTALKING_USERNAME,
-            api_key=settings.AFRICASTALKING_API_KEY,
-            sender_id=getattr(settings, 'AFRICASTALKING_SENDER_ID', None)
+        self.provider = BeemAfrica(
+            api_key=settings.BEEM_API_KEY,
+            secret_key=settings.BEEM_SECRET_KEY,
+            sender_name=getattr(settings, 'BEEM_AFRICA_SENDER_NAME', 'INFO')
         )
     
     def send_sms(self, phone_number, message):

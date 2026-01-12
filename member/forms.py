@@ -9,7 +9,7 @@ class MemberForm(forms.ModelForm):
         fields = [
             'name', 'code', 'active', 'shepherd', 'ministry', 'telephone',
             'location', 'fathers_name', 'mothers_name', 'guardians_name',
-            'new_believer_school', 'pays_tithe', 'working', 'schooling', 'picture'
+            'new_believer_school', 'pays_tithe', 'working', 'schooling', 'picture','transfer_update','transfered'
         ]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter full name'}),
@@ -26,6 +26,8 @@ class MemberForm(forms.ModelForm):
             'pays_tithe': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'working': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'schooling': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'transfered': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'transfer_update': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Enter details of the member'}),
             'picture': forms.FileInput(attrs={'class': 'form-control'}),
         }
     

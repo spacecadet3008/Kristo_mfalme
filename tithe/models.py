@@ -1,6 +1,7 @@
 from django.utils import timezone
 from django.db import models
 from member.models import Member
+from . import sms_service
 
 class TithePayment(models.Model):
     PAYMENT_STATUS_CHOICES = [
@@ -27,6 +28,7 @@ class TithePayment(models.Model):
     
     def __str__(self):
         return f"{self.name} - {self.amount} - {self.date.strftime('%Y-%m-%d')}"
+
     
 
 class TitheReceipt(models.Model):

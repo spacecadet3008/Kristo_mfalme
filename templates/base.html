@@ -1,2053 +1,2535 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Church System</title>
-    
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Church Management System</title>
+
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <!-- Material Icons -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
     <style>
-        /* CSS Reset and Base Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+      /* CSS Reset and Base Styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        font-family: "Poppins", -apple-system, BlinkMacSystemFont, sans-serif;
+      }
 
-        :root {
-            /* Primary Colors - Flutter-inspired */
-            --primary: #1a73e8;
-            --primary-dark: #0d47a1;
-            --primary-light: #42a5f5;
-            --secondary: #34a853;
-            --secondary-dark: #2e7d32;
-            --accent: #fbbc04;
-            --danger: #ea4335;
-            --warning: #fbbc04;
-            --success: #34a853;
-            --info: #4285f4;
-            
-            /* Neutral Colors */
-            --background: #f8f9fa;
-            --surface: #ffffff;
-            --surface-dark: #202124;
-            --text-primary: #202124;
-            --text-secondary: #5f6368;
-            --text-disabled: #9aa0a6;
-            --divider: #dadce0;
-            
-            /* Shadows - Material Design inspired */
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
-            --shadow-xl: 0 20px 40px rgba(0,0,0,0.2);
-            
-            /* Border Radius */
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 24px;
-            --radius-full: 9999px;
-            
-            /* Spacing */
-            --space-xs: 4px;
-            --space-sm: 8px;
-            --space-md: 16px;
-            --space-lg: 24px;
-            --space-xl: 32px;
-            --space-2xl: 48px;
-            
-            /* Transitions */
-            --transition-fast: 150ms ease;
-            --transition-base: 250ms ease;
-            --transition-slow: 350ms ease;
-            
-            /* Layout */
-            --sidebar-width: 280px;
-            --sidebar-collapsed: 72px;
-            --header-height: 64px;
-        }
+      :root {
+        /* Primary Colors */
+        --primary: #1a73e8;
+        --primary-dark: #0d47a1;
+        --primary-light: #42a5f5;
+        --secondary: #34a853;
+        --secondary-dark: #2e7d32;
+        --accent: #fbbc04;
+        --danger: #ea4335;
+        --warning: #fbbc04;
+        --success: #34a853;
+        --info: #4285f4;
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--background);
-            color: var(--text-primary);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
+        /* Neutral Colors */
+        --background: #f8f9fa;
+        --surface: #ffffff;
+        --surface-dark: #202124;
+        --text-primary: #202124;
+        --text-secondary: #5f6368;
+        --text-disabled: #9aa0a6;
+        --divider: #dadce0;
 
-        /* Typography */
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            line-height: 1.2;
-        }
+        /* Shadows */
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+        --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
 
-        .text-display {
-            font-size: 3.5rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
+        /* Border Radius */
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+        --radius-xl: 24px;
+        --radius-full: 9999px;
 
-        .text-headline {
-            font-size: 2.5rem;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-        }
+        /* Spacing */
+        --space-xs: 4px;
+        --space-sm: 8px;
+        --space-md: 16px;
+        --space-lg: 24px;
+        --space-xl: 32px;
+        --space-2xl: 48px;
 
-        .text-title {
-            font-size: 1.75rem;
-            font-weight: 600;
-        }
+        /* Transitions */
+        --transition-fast: 150ms ease;
+        --transition-base: 250ms ease;
+        --transition-slow: 350ms ease;
 
-        .text-subtitle {
-            font-size: 1.25rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
+        /* Layout */
+        --sidebar-width: 280px;
+        --sidebar-collapsed: 72px;
+        --header-height: 64px;
+      }
 
-        .text-body {
-            font-size: 1rem;
-            font-weight: 400;
-        }
+      body {
+        font-family: "Poppins", -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--background);
+        color: var(--text-primary);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow: hidden;
+      }
 
-        .text-caption {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
+      /* Typography - All Poppins */
+      h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, select, label, div {
+        font-family: "Poppins", sans-serif !important;
+      }
 
-        .text-overline {
-            font-size: 0.75rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
+      h1 { font-size: 2rem; font-weight: 700; }
+      h2 { font-size: 1.75rem; font-weight: 700; }
+      h3 { font-size: 1.5rem; font-weight: 600; }
+      h4 { font-size: 1.25rem; font-weight: 600; }
+      h5 { font-size: 1.125rem; font-weight: 600; }
+      h6 { font-size: 1rem; font-weight: 600; }
 
-        /* Layout Container */
-        .app-container {
-            display: flex;
-            min-height: 100vh;
-            position: relative;
-        }
+      .text-muted { color: var(--text-secondary); }
+      .text-primary { color: var(--primary); }
+      .text-success { color: var(--success); }
+      .text-danger { color: var(--danger); }
+      .text-warning { color: var(--warning); }
+      .text-info { color: var(--info); }
 
-        /* Sidebar Styles */
+      /* Layout Container */
+      .app-container {
+        display: flex;
+        min-height: 100vh;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Sidebar Styles */
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: var(--sidebar-width);
+        background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary) 100%);
+        color: white;
+        z-index: 1000;
+        transition: transform var(--transition-base), width var(--transition-base);
+        overflow-y: auto;
+        overflow-x: hidden;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+
+      .sidebar.collapsed {
+        width: var(--sidebar-collapsed);
+      }
+
+      .sidebar-header {
+        padding: var(--space-lg);
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        flex-shrink: 0;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        text-decoration: none;
+      }
+
+      .logo-icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        flex-shrink: 0;
+      }
+
+      .logo-text {
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: white;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .sidebar.collapsed .logo-text {
+        display: none;
+      }
+
+      /* Sidebar Navigation */
+      .sidebar-nav {
+        flex: 1;
+        padding: var(--space-md) 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .nav-scroll-container {
+        flex: 1;
+        overflow-y: auto;
+        padding-bottom: var(--space-md);
+        height: 100%;
+      }
+
+      .nav-section {
+        margin-bottom: var(--space-lg);
+      }
+
+      .nav-label {
+        padding: var(--space-sm) var(--space-lg);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: var(--space-sm);
+        font-weight: 600;
+      }
+
+      .sidebar.collapsed .nav-label {
+        display: none;
+      }
+
+      .nav-item {
+        position: relative;
+        margin: 0 var(--space-sm);
+      }
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        padding: var(--space-md) var(--space-lg);
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        border-radius: var(--radius-md);
+        transition: all var(--transition-fast);
+        position: relative;
+        overflow: hidden;
+        font-weight: 500;
+      }
+
+      .nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        transform: translateX(4px);
+      }
+
+      .nav-link.active {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        font-weight: 600;
+      }
+
+      .nav-link.active::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--accent);
+        border-radius: 0 var(--radius-full) var(--radius-full) 0;
+      }
+
+      .nav-icon {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+      }
+
+      .nav-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1;
+        font-weight: 500;
+      }
+
+      .sidebar.collapsed .nav-text {
+        display: none;
+      }
+
+      .nav-badge {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 2px 8px;
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: auto;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: relative;
+      }
+
+      .nav-toggle {
+        cursor: pointer;
+        position: relative;
+        user-select: none;
+      }
+
+      .nav-toggle .nav-chevron {
+        margin-left: auto;
+        font-size: 0.875rem;
+        transition: transform var(--transition-base);
+      }
+
+      .submenu {
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height var(--transition-base) ease;
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: var(--radius-md);
+        margin: var(--space-sm) var(--space-sm) var(--space-sm) calc(var(--space-lg) + 24px);
+      }
+
+      .submenu.open {
+        max-height: 500px;
+      }
+
+      .sidebar.collapsed .submenu {
+        display: none;
+      }
+
+      .submenu-link {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        padding: var(--space-sm) var(--space-lg);
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        border-radius: var(--radius-sm);
+        transition: all var(--transition-fast);
+        position: relative;
+        font-weight: 500;
+      }
+
+      .submenu-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+
+      .submenu-link.active {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        font-weight: 600;
+      }
+
+      .submenu-icon {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+      }
+
+      .submenu-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1;
+        font-weight: 500;
+      }
+
+      /* Sidebar Footer */
+      .sidebar-footer {
+        padding: var(--space-md) var(--space-lg);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: auto;
+        flex-shrink: 0;
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar.collapsed .sidebar-footer {
+        padding: var(--space-md);
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        margin-bottom: var(--space-sm);
+      }
+
+      .user-avatar-sm {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        flex-shrink: 0;
+      }
+
+      .user-avatar-sm img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .user-details {
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .user-name {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: white;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .user-role {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.7);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .sidebar.collapsed .user-details {
+        display: none;
+      }
+
+      .logout-btn {
+        width: 100%;
+        padding: var(--space-sm);
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        font-weight: 500;
+        transition: all var(--transition-fast);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-sm);
+      }
+
+      .logout-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-1px);
+      }
+
+      .sidebar.collapsed .logout-btn span {
+        display: none;
+      }
+
+      /* Header Styles */
+      .app-header {
+        position: fixed;
+        top: 0;
+        left: var(--sidebar-width);
+        right: 0;
+        height: var(--header-height);
+        background: var(--surface);
+        border-bottom: 1px solid var(--divider);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 var(--space-lg);
+        z-index: 900;
+        transition: left var(--transition-base);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .sidebar.collapsed ~ .app-header {
+        left: var(--sidebar-collapsed);
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+      }
+
+      .menu-toggle {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-md);
+        background: var(--surface);
+        border: 1px solid var(--divider);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+
+      .menu-toggle:hover {
+        background: var(--background);
+        transform: rotate(90deg);
+      }
+
+      /* Notification Styles */
+      .notification-dropdown {
+        position: relative;
+      }
+
+      .notification-btn {
+        position: relative;
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-full);
+        background: var(--surface);
+        border: 1px solid var(--divider);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        color: var(--text-secondary);
+        font-size: 1.25rem;
+      }
+
+      .notification-btn:hover {
+        background: var(--background);
+        color: var(--primary);
+        transform: translateY(-1px);
+      }
+
+      .notification-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        width: 18px;
+        height: 18px;
+        background: var(--danger);
+        color: white;
+        border-radius: var(--radius-full);
+        font-size: 0.65rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid var(--surface);
+      }
+
+      .notification-dropdown-content {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        width: 360px;
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-xl);
+        border: 1px solid var(--divider);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all var(--transition-base);
+        z-index: 1000;
+        max-height: 500px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .notification-dropdown-content.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .notification-header {
+        padding: var(--space-md) var(--space-lg);
+        border-bottom: 1px solid var(--divider);
+      }
+
+      .notification-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: var(--space-sm);
+      }
+
+      .notification-title h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .unread-count {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 2px 8px;
+        background: var(--primary-light);
+        color: white;
+        border-radius: var(--radius-full);
+      }
+
+      .mark-all-read {
+        font-size: 0.8rem;
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color var(--transition-fast);
+      }
+
+      .mark-all-read:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+      }
+
+      .notification-list {
+        flex: 1;
+        overflow-y: auto;
+        max-height: 300px;
+        min-height: 100px;
+      }
+
+      .notification-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-xl);
+        text-align: center;
+        color: var(--text-secondary);
+      }
+
+      .notification-loading i {
+        font-size: 1.5rem;
+        margin-bottom: var(--space-sm);
+        color: var(--primary-light);
+      }
+
+      .notification-item {
+        padding: var(--space-md) var(--space-lg);
+        border-bottom: 1px solid var(--divider);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+      }
+
+      .notification-item:hover {
+        background: var(--background);
+      }
+
+      .notification-item.unread {
+        background: rgba(66, 133, 244, 0.05);
+      }
+
+      .notification-item-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: var(--space-xs);
+      }
+
+      .notification-title-text {
+        font-weight: 500;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+      }
+
+      .notification-time {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        white-space: nowrap;
+        margin-left: var(--space-sm);
+      }
+
+      .notification-message {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.4;
+        margin-bottom: var(--space-xs);
+      }
+
+      .notification-type {
+        display: inline-block;
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: var(--radius-full);
+        font-weight: 600;
+        margin-top: var(--space-xs);
+      }
+
+      .notification-success {
+        background: rgba(52, 168, 83, 0.1);
+        color: var(--success);
+      }
+
+      .notification-warning {
+        background: rgba(251, 188, 4, 0.1);
+        color: var(--warning);
+      }
+
+      .notification-info {
+        background: rgba(66, 133, 244, 0.1);
+        color: var(--info);
+      }
+
+      .notification-danger {
+        background: rgba(234, 67, 53, 0.1);
+        color: var(--danger);
+      }
+
+      .notification-footer {
+        padding: var(--space-md) var(--space-lg);
+        border-top: 1px solid var(--divider);
+        text-align: center;
+      }
+
+      .notification-footer a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: color var(--transition-fast);
+      }
+
+      .notification-footer a:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+      }
+
+      /* Empty state for notifications */
+      .notification-empty {
+        padding: var(--space-xl);
+        text-align: center;
+        color: var(--text-secondary);
+      }
+
+      .notification-empty i {
+        font-size: 2rem;
+        color: var(--divider);
+        margin-bottom: var(--space-md);
+      }
+
+      /* Main Content */
+      .main-content {
+        position: fixed;
+        top: var(--header-height);
+        left: var(--sidebar-width);
+        right: 0;
+        bottom: 0;
+        padding: var(--space-lg);
+        transition: left var(--transition-base), width var(--transition-base);
+        overflow-y: auto;
+        background: var(--background);
+        width: calc(100% - var(--sidebar-width));
+      }
+
+      .sidebar.collapsed ~ .main-content {
+        left: var(--sidebar-collapsed);
+        width: calc(100% - var(--sidebar-collapsed));
+      }
+
+      /* Content wrapper for pages */
+      .content-wrapper {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        min-height: 100%;
+      }
+
+      /* Card container for content */
+      .content-card {
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        padding: var(--space-xl);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: var(--space-lg);
+        min-height: calc(100% - 100px);
+      }
+
+      /* Modal Styles */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all var(--transition-base);
+      }
+
+      .modal-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .modal {
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        width: 90%;
+        max-width: 400px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: var(--shadow-xl);
+        transform: translateY(20px);
+        transition: transform var(--transition-base);
+      }
+
+      .modal-overlay.show .modal {
+        transform: translateY(0);
+      }
+
+      .modal-header {
+        padding: var(--space-lg);
+        border-bottom: 1px solid var(--divider);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .modal-body {
+        padding: var(--space-lg);
+      }
+
+      .modal-footer {
+        padding: var(--space-lg);
+        border-top: 1px solid var(--divider);
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--space-sm);
+      }
+
+      /* Button Styles (replacing Bootstrap) */
+      .btn {
+        padding: var(--space-sm) var(--space-md);
+        border-radius: var(--radius-md);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        border: none;
+        font-family: "Poppins", sans-serif;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-sm);
+        text-decoration: none;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+        border: 1px solid var(--primary);
+      }
+
+      .btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .btn-secondary {
+        background: var(--secondary);
+        color: white;
+        border: 1px solid var(--secondary);
+      }
+
+      .btn-secondary:hover {
+        background: var(--secondary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .btn-danger {
+        background: var(--danger);
+        color: white;
+        border: 1px solid var(--danger);
+      }
+
+      .btn-danger:hover {
+        background: #d32f2f;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .btn-success {
+        background: var(--success);
+        color: white;
+        border: 1px solid var(--success);
+      }
+
+      .btn-success:hover {
+        background: var(--secondary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .btn-outline {
+        background: transparent;
+        color: var(--text-primary);
+        border: 1px solid var(--divider);
+      }
+
+      .btn-outline:hover {
+        background: var(--background);
+        border-color: var(--text-secondary);
+      }
+
+      .btn-outline-primary {
+        background: transparent;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+      }
+
+      .btn-outline-primary:hover {
+        background: rgba(26, 115, 232, 0.1);
+      }
+
+      .btn-sm {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 0.75rem;
+      }
+
+      .btn-lg {
+        padding: var(--space-md) var(--space-lg);
+        font-size: 1rem;
+      }
+
+      .btn-block {
+        width: 100%;
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+
+      /* Form Styles (replacing Bootstrap) */
+      .form-group {
+        margin-bottom: var(--space-md);
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: var(--space-xs);
+        font-weight: 500;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: var(--space-sm) var(--space-md);
+        border: 1px solid var(--divider);
+        border-radius: var(--radius-md);
+        font-size: 0.875rem;
+        font-family: "Poppins", sans-serif;
+        transition: all var(--transition-fast);
+        background: var(--surface);
+        color: var(--text-primary);
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+      }
+
+      .form-control::placeholder {
+        color: var(--text-disabled);
+      }
+
+      .form-text {
+        display: block;
+        margin-top: var(--space-xs);
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+      }
+
+      .form-select {
+        width: 100%;
+        padding: var(--space-sm) var(--space-md);
+        border: 1px solid var(--divider);
+        border-radius: var(--radius-md);
+        font-size: 0.875rem;
+        font-family: "Poppins", sans-serif;
+        background: var(--surface);
+        color: var(--text-primary);
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%235f6368' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right var(--space-md) center;
+        background-size: 16px;
+        padding-right: calc(var(--space-md) * 2 + 16px);
+      }
+
+      .form-select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+      }
+
+      .form-check {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        margin-bottom: var(--space-sm);
+        cursor: pointer;
+      }
+
+      .form-check-input {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        cursor: pointer;
+      }
+
+      .form-check-label {
+        font-size: 0.875rem;
+        color: var(--text-primary);
+        cursor: pointer;
+      }
+
+      .invalid-feedback {
+        display: block;
+        margin-top: var(--space-xs);
+        font-size: 0.75rem;
+        color: var(--danger);
+      }
+
+      .is-invalid {
+        border-color: var(--danger) !important;
+      }
+
+      .is-invalid:focus {
+        box-shadow: 0 0 0 3px rgba(234, 67, 53, 0.1) !important;
+      }
+
+      /* Alert Styles (replacing Bootstrap) */
+      .alert {
+        padding: var(--space-md) var(--space-lg);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--space-md);
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-sm);
+        border-left: 4px solid;
+      }
+
+      .alert-success {
+        background: rgba(52, 168, 83, 0.1);
+        border-left-color: var(--success);
+        color: var(--text-primary);
+      }
+
+      .alert-danger {
+        background: rgba(234, 67, 53, 0.1);
+        border-left-color: var(--danger);
+        color: var(--text-primary);
+      }
+
+      .alert-warning {
+        background: rgba(251, 188, 4, 0.1);
+        border-left-color: var(--warning);
+        color: var(--text-primary);
+      }
+
+      .alert-info {
+        background: rgba(66, 133, 244, 0.1);
+        border-left-color: var(--info);
+        color: var(--text-primary);
+      }
+
+      .alert-icon {
+        font-size: 1.25rem;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
+      .alert-content {
+        flex: 1;
+      }
+
+      .alert-content p {
+        margin: 0;
+        font-size: 0.875rem;
+      }
+
+      .alert-close {
+        background: none;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        font-size: 1rem;
+        opacity: 0.7;
+        transition: opacity var(--transition-fast);
+        padding: 0;
+        margin-left: auto;
+      }
+
+      .alert-close:hover {
+        opacity: 1;
+      }
+
+      /* Card Styles (replacing Bootstrap) */
+      .card {
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--divider);
+        margin-bottom: var(--space-md);
+        overflow: hidden;
+      }
+
+      .card-header {
+        padding: var(--space-lg);
+        border-bottom: 1px solid var(--divider);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .card-body {
+        padding: var(--space-lg);
+      }
+
+      .card-footer {
+        padding: var(--space-lg);
+        border-top: 1px solid var(--divider);
+        background: var(--background);
+      }
+
+      /* Table Styles (replacing Bootstrap) */
+      .table-responsive {
+        overflow-x: auto;
+        margin-bottom: var(--space-md);
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+      }
+
+      .table thead th {
+        background: var(--background);
+        padding: var(--space-md) var(--space-lg);
+        text-align: left;
+        font-weight: 600;
+        color: var(--text-primary);
+        border-bottom: 2px solid var(--divider);
+        white-space: nowrap;
+      }
+
+      .table tbody td {
+        padding: var(--space-md) var(--space-lg);
+        border-bottom: 1px solid var(--divider);
+        color: var(--text-primary);
+      }
+
+      .table tbody tr:hover {
+        background: var(--background);
+      }
+
+      .table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .table-striped tbody tr:nth-child(odd) {
+        background: rgba(0, 0, 0, 0.02);
+      }
+
+      /* Badge Styles (replacing Bootstrap) */
+      .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-radius: var(--radius-full);
+        line-height: 1;
+      }
+
+      .badge-primary {
+        background: rgba(26, 115, 232, 0.1);
+        color: var(--primary);
+      }
+
+      .badge-success {
+        background: rgba(52, 168, 83, 0.1);
+        color: var(--success);
+      }
+
+      .badge-danger {
+        background: rgba(234, 67, 53, 0.1);
+        color: var(--danger);
+      }
+
+      .badge-warning {
+        background: rgba(251, 188, 4, 0.1);
+        color: var(--warning);
+      }
+
+      .badge-info {
+        background: rgba(66, 133, 244, 0.1);
+        color: var(--info);
+      }
+
+      /* Messages */
+      .message-card {
+        animation: slideUp var(--transition-base);
+      }
+
+      .message-danger {
+        border-left: 4px solid var(--danger);
+      }
+
+      .message-success {
+        border-left: 4px solid var(--success);
+      }
+
+      /* Responsive Design */
+      @media (max-width: 1200px) {
         .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: var(--sidebar-width);
-            background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary) 100%);
-            color: white;
-            z-index: 1000;
-            transition: transform var(--transition-base), width var(--transition-base);
-            overflow-y: auto;
-            overflow-x: hidden;
-            box-shadow: var(--shadow-lg);
+          transform: translateX(-100%);
         }
 
-        .sidebar.collapsed {
-            width: var(--sidebar-collapsed);
+        .sidebar.show {
+          transform: translateX(0);
         }
 
-        .sidebar-header {
-            padding: var(--space-lg);
-            display: flex;
-            align-items: center;
-            gap: var(--space-md);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: var(--space-md);
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: white;
-        }
-
-        .logo-text {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 700;
-            font-size: 1.25rem;
-            color: white;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .sidebar.collapsed .logo-text {
-            display: none;
-        }
-
-        .sidebar-nav {
-            padding: var(--space-md) 0;
-        }
-
-        .nav-section {
-            margin-bottom: var(--space-lg);
-        }
-
-        .nav-label {
-            padding: var(--space-sm) var(--space-lg);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: var(--space-sm);
-        }
-
-        .sidebar.collapsed .nav-label {
-            display: none;
-        }
-
-        .nav-item {
-            position: relative;
-            margin: 0 var(--space-sm);
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: var(--space-md);
-            padding: var(--space-md) var(--space-lg);
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            border-radius: var(--radius-md);
-            transition: all var(--transition-fast);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-link:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            transform: translateX(4px);
-        }
-
-        .nav-link.active {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            font-weight: 500;
-        }
-
-        .nav-link.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: var(--accent);
-            border-radius: 0 var(--radius-full) var(--radius-full) 0;
-        }
-
-        .nav-icon {
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            flex-shrink: 0;
-        }
-
-        .nav-text {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            flex: 1;
-        }
-
-        .sidebar.collapsed .nav-text {
-            display: none;
-        }
-
-        .nav-badge {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 2px 8px;
-            border-radius: var(--radius-full);
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-left: auto;
-        }
-
-        .sidebar.collapsed .nav-badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            font-size: 0.625rem;
-            padding: 1px 4px;
-        }
-
-        .nav-chevron {
-            transition: transform var(--transition-fast);
-        }
-
-        .nav-toggle.active .nav-chevron {
-            transform: rotate(180deg);
-        }
-
-        .nav-divider {
-            height: 1px;
-            background: rgba(255, 255, 255, 0.1);
-            margin: var(--space-lg) var(--space-lg);
-        }
-
-        .sidebar.collapsed .nav-divider {
-            margin: var(--space-lg) var(--space-md);
-        }
-
-        /* Dropdown Menu Styles */
-        .dropdown-menu {
-            position: relative;
-        }
-
-        .nav-toggle {
-            cursor: pointer;
-            position: relative;
-            user-select: none;
-        }
-
-        .nav-toggle .nav-chevron {
-            margin-left: auto;
-            font-size: 0.875rem;
-            transition: transform var(--transition-base);
-        }
-
-        .submenu {
-            overflow: hidden;
-            max-height: 0;
-            transition: max-height var(--transition-base) ease;
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: var(--radius-md);
-            margin: var(--space-sm) var(--space-sm) var(--space-sm) calc(var(--space-lg) + 24px);
-        }
-
-        .submenu.open {
-            max-height: 500px;
-        }
-
-        .sidebar.collapsed .submenu {
-            display: none;
-        }
-
-        .submenu-link {
-            display: flex;
-            align-items: center;
-            gap: var(--space-md);
-            padding: var(--space-sm) var(--space-lg);
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            border-radius: var(--radius-sm);
-            transition: all var(--transition-fast);
-            position: relative;
-        }
-
-        .submenu-link:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-
-        .submenu-link.active {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            font-weight: 500;
-        }
-
-        .submenu-link.active::before {
-            content: '';
-            position: absolute;
-            left: 4px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 4px;
-            background: var(--accent);
-            border-radius: 50%;
-        }
-
-        .submenu-icon {
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            flex-shrink: 0;
-        }
-
-        .submenu-text {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            flex: 1;
-        }
-
-        .sidebar.collapsed .submenu-text {
-            display: none;
-        }
-
-        .sidebar.collapsed .submenu-link {
-            justify-content: center;
-            padding: var(--space-sm);
-        }
-
-        .sidebar.collapsed .submenu-icon {
-            font-size: 1.25rem;
-        }
-
-        /* Header Styles */
-        .app-header {
-            position: fixed;
-            top: 0;
-            left: var(--sidebar-width);
-            right: 0;
-            height: var(--header-height);
-            background: var(--surface);
-            border-bottom: 1px solid var(--divider);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 var(--space-lg);
-            z-index: 900;
-            transition: left var(--transition-base);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .sidebar.collapsed ~ .app-header {
-            left: var(--sidebar-collapsed);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: var(--space-md);
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: var(--space-md);
-        }
-
-        .menu-toggle {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius-md);
-            background: var(--surface);
-            border: 1px solid var(--divider);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            color: var(--text-primary);
-        }
-
-        .menu-toggle:hover {
-            background: var(--background);
-            transform: rotate(90deg);
-        }
-
-        .search-container {
-            position: relative;
-            width: 300px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: var(--space-sm) var(--space-md) var(--space-sm) 48px;
-            border: 1px solid var(--divider);
-            border-radius: var(--radius-full);
-            font-family: inherit;
-            font-size: 0.875rem;
-            background: var(--background);
-            transition: all var(--transition-fast);
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: var(--surface);
-            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: var(--space-md);
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-            pointer-events: none;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-        }
-
-        .action-button {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius-md);
-            background: var(--surface);
-            border: 1px solid var(--divider);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            position: relative;
-            color: var(--text-primary);
-        }
-
-        .action-button:hover {
-            background: var(--background);
-            color: var(--primary);
-            transform: translateY(-1px);
-        }
-
-        .action-button.has-notification::after {
-            content: '';
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 8px;
-            height: 8px;
-            background: var(--danger);
-            border-radius: 50%;
-            border: 2px solid var(--surface);
-        }
-
-        .user-menu {
-            position: relative;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 2px solid var(--primary);
-            cursor: pointer;
-        }
-
-        .user-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .user-dropdown {
-            position: absolute;
-            top: calc(100% + var(--space-sm));
-            right: 0;
-            width: 280px;
-            background: var(--surface);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--divider);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all var(--transition-fast);
-            z-index: 1000;
-        }
-
-        .user-dropdown.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .dropdown-header {
-            padding: var(--space-lg);
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            border-radius: var(--radius-md) var(--radius-md) 0 0;
-        }
-
-        .dropdown-header h4 {
-            color: white;
-            margin-bottom: var(--space-xs);
-        }
-
-        .dropdown-header p {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 0.875rem;
-        }
-
-        .dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: var(--space-md);
-            padding: var(--space-md) var(--space-lg);
-            color: var(--text-primary);
-            text-decoration: none;
-            transition: all var(--transition-fast);
-            border-bottom: 1px solid var(--divider);
-        }
-
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-item:hover {
-            background: var(--background);
-            color: var(--primary);
-        }
-
-        .dropdown-item i {
-            width: 20px;
-            color: var(--text-secondary);
-        }
-
-        .dropdown-item:hover i {
-            color: var(--primary);
-        }
-
-        .dropdown-footer {
-            padding: var(--space-md) var(--space-lg);
-            border-top: 1px solid var(--divider);
-            text-align: center;
-        }
-
-        /* Main Content */
+        .app-header,
         .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            margin-top: var(--header-height);
-            padding: var(--space-lg);
-            transition: margin-left var(--transition-base);
-            min-height: calc(100vh - var(--header-height));
+          left: 0;
+          width: 100%;
         }
 
-        .sidebar.collapsed ~ .main-content {
-            margin-left: var(--sidebar-collapsed);
+        .sidebar-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 999;
+          opacity: 0;
+          visibility: hidden;
+          transition: all var(--transition-base);
         }
 
-        /* Card Components */
-        .card {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            padding: var(--space-lg);
-            box-shadow: var(--shadow-sm);
-            transition: all var(--transition-base);
-            border: 1px solid var(--divider);
+        .sidebar-overlay.show {
+          opacity: 1;
+          visibility: visible;
         }
+      }
 
-        .card:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: var(--space-lg);
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .card-actions {
-            display: flex;
-            gap: var(--space-sm);
-        }
-
-        .card-content {
-            color: var(--text-secondary);
-        }
-
-        /* Grid System */
-        .grid {
-            display: grid;
-            gap: var(--space-lg);
-        }
-
-        .grid-2 {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .grid-3 {
-            grid-template-columns: repeat(3, 1fr);
-        }
-
-        .grid-4 {
-            grid-template-columns: repeat(4, 1fr);
-        }
-
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--space-sm);
-            padding: var(--space-sm) var(--space-md);
-            border-radius: var(--radius-md);
-            font-family: inherit;
-            font-size: 0.875rem;
-            font-weight: 500;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            white-space: nowrap;
-            user-select: none;
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-secondary {
-            background: var(--secondary);
-            color: white;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--divider);
-            color: var(--text-primary);
-        }
-
-        .btn-outline:hover:not(:disabled) {
-            background: var(--background);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-icon {
-            width: 40px;
-            height: 40px;
-            padding: 0;
-            border-radius: var(--radius-md);
-        }
-
-        /* Badges */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2px 8px;
-            border-radius: var(--radius-full);
-            font-size: 0.75rem;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .badge-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .badge-success {
-            background: var(--success);
-            color: white;
-        }
-
-        .badge-warning {
-            background: var(--warning);
-            color: var(--text-primary);
-        }
-
-        .badge-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all var(--transition-base);
-        }
-
-        .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
+      @media (max-width: 768px) {
+        .main-content {
+          padding: var(--space-md);
         }
 
         .modal {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-xl);
-            transform: translateY(20px);
-            transition: transform var(--transition-base);
+          width: 95%;
+          max-height: 80vh;
         }
 
-        .modal-overlay.show .modal {
-            transform: translateY(0);
+        .submenu {
+          margin-left: calc(var(--space-md) + 24px);
         }
 
-        .modal-header {
-            padding: var(--space-lg);
-            border-bottom: 1px solid var(--divider);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .content-card {
+          padding: var(--space-lg);
+        }
+        
+        .notification-dropdown-content {
+          width: 100%;
         }
 
-        .modal-body {
-            padding: var(--space-lg);
+        .card-header,
+        .card-body,
+        .card-footer {
+          padding: var(--space-md);
         }
 
+        .table thead th,
+        .table tbody td {
+          padding: var(--space-sm) var(--space-md);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .main-content {
+          padding: var(--space-sm);
+        }
+
+        .content-card {
+          padding: var(--space-md);
+        }
+        
+        .header-left h3 {
+          font-size: 0.9rem;
+        }
+
+        .btn {
+          padding: var(--space-xs) var(--space-sm);
+          font-size: 0.75rem;
+        }
+
+        .modal-header,
+        .modal-body,
         .modal-footer {
-            padding: var(--space-lg);
-            border-top: 1px solid var(--divider);
-            display: flex;
-            justify-content: flex-end;
-            gap: var(--space-sm);
+          padding: var(--space-md);
         }
+      }
 
-        /* Notification Panel */
-        .notification-panel {
-            position: absolute;
-            top: calc(100% + var(--space-sm));
-            right: 0;
-            width: 380px;
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-xl);
-            border: 1px solid var(--divider);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all var(--transition-base);
-            z-index: 1000;
+      /* Animation Classes */
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
         }
-
-        .notification-panel.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
+      }
 
-        .notification-header {
-            padding: var(--space-lg);
-            border-bottom: 1px solid var(--divider);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+      /* Custom Scrollbars */
+      .main-content::-webkit-scrollbar {
+        width: 8px;
+      }
 
-        .notification-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
+      .main-content::-webkit-scrollbar-track {
+        background: var(--background);
+        border-radius: var(--radius-full);
+      }
 
-        .notification-item {
-            display: flex;
-            align-items: flex-start;
-            gap: var(--space-md);
-            padding: var(--space-md) var(--space-lg);
-            border-bottom: 1px solid var(--divider);
-            transition: all var(--transition-fast);
-        }
+      .main-content::-webkit-scrollbar-thumb {
+        background: var(--divider);
+        border-radius: var(--radius-full);
+      }
 
-        .notification-item:hover {
-            background: var(--background);
-        }
+      .main-content::-webkit-scrollbar-thumb:hover {
+        background: var(--text-disabled);
+      }
 
-        .notification-item.unread {
-            background: rgba(var(--primary), 0.05);
-        }
+      /* Hide scrollbar for Chrome, Safari and Opera */
+      .sidebar-nav::-webkit-scrollbar {
+        display: none;
+      }
 
-        .notification-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
+      /* Hide scrollbar for IE, Edge and Firefox */
+      .sidebar-nav {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
 
-        .notification-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+      /* Utility Classes */
+      .hidden {
+        display: none !important;
+      }
 
-        .notification-content {
-            flex: 1;
-        }
+      .d-none { display: none !important; }
+      .d-block { display: block !important; }
+      .d-flex { display: flex !important; }
+      .d-inline-flex { display: inline-flex !important; }
 
-        .notification-title {
-            font-weight: 500;
-            margin-bottom: 2px;
-        }
+      .flex-column { flex-direction: column; }
+      .flex-row { flex-direction: row; }
+      .flex-wrap { flex-wrap: wrap; }
+      .flex-nowrap { flex-wrap: nowrap; }
 
-        .notification-message {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            margin-bottom: var(--space-xs);
-        }
+      .align-items-center { align-items: center; }
+      .align-items-start { align-items: flex-start; }
+      .align-items-end { align-items: flex-end; }
+      .justify-content-center { justify-content: center; }
+      .justify-content-between { justify-content: space-between; }
+      .justify-content-end { justify-content: flex-end; }
 
-        .notification-time {
-            font-size: 0.75rem;
-            color: var(--text-disabled);
-        }
+      .text-center { text-align: center; }
+      .text-left { text-align: left; }
+      .text-right { text-align: right; }
 
-        .notification-footer {
-            padding: var(--space-md) var(--space-lg);
-            border-top: 1px solid var(--divider);
-            text-align: center;
-        }
+      .w-100 { width: 100%; }
+      .h-100 { height: 100%; }
 
-        /* Quick Actions Panel */
-        .actions-panel {
-            position: absolute;
-            top: calc(100% + var(--space-sm));
-            right: 0;
-            width: 320px;
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-xl);
-            border: 1px solid var(--divider);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all var(--transition-base);
-            z-index: 1000;
-        }
+      .m-0 { margin: 0; }
+      .p-0 { padding: 0; }
 
-        .actions-panel.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
+      .mt-1 { margin-top: var(--space-xs); }
+      .mt-2 { margin-top: var(--space-sm); }
+      .mt-3 { margin-top: var(--space-md); }
+      .mt-4 { margin-top: var(--space-lg); }
+      .mt-5 { margin-top: var(--space-xl); }
 
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: var(--space-md);
-            padding: var(--space-lg);
-        }
+      .mb-1 { margin-bottom: var(--space-xs); }
+      .mb-2 { margin-bottom: var(--space-sm); }
+      .mb-3 { margin-bottom: var(--space-md); }
+      .mb-4 { margin-bottom: var(--space-lg); }
+      .mb-5 { margin-bottom: var(--space-xl); }
 
-        .action-tile {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: var(--space-sm);
-            padding: var(--space-md);
-            border-radius: var(--radius-md);
-            background: var(--background);
-            text-decoration: none;
-            transition: all var(--transition-fast);
-        }
+      .ms-1 { margin-left: var(--space-xs); }
+      .ms-2 { margin-left: var(--space-sm); }
+      .ms-3 { margin-left: var(--space-md); }
+      .ms-4 { margin-left: var(--space-lg); }
+      .ms-5 { margin-left: var(--space-xl); }
 
-        .action-tile:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-2px);
-        }
+      .me-1 { margin-right: var(--space-xs); }
+      .me-2 { margin-right: var(--space-sm); }
+      .me-3 { margin-right: var(--space-md); }
+      .me-4 { margin-right: var(--space-lg); }
+      .me-5 { margin-right: var(--space-xl); }
 
-        .action-tile i {
-            font-size: 1.5rem;
-            color: inherit;
-        }
+      .p-1 { padding: var(--space-xs); }
+      .p-2 { padding: var(--space-sm); }
+      .p-3 { padding: var(--space-md); }
+      .p-4 { padding: var(--space-lg); }
+      .p-5 { padding: var(--space-xl); }
 
-        .action-tile span {
-            font-size: 0.75rem;
-            text-align: center;
-            color: inherit;
-        }
+      .pt-1 { padding-top: var(--space-xs); }
+      .pt-2 { padding-top: var(--space-sm); }
+      .pt-3 { padding-top: var(--space-md); }
+      .pt-4 { padding-top: var(--space-lg); }
+      .pt-5 { padding-top: var(--space-xl); }
 
-        .actions-footer {
-            padding: var(--space-md) var(--space-lg);
-            border-top: 1px solid var(--divider);
-            text-align: center;
-        }
+      .pb-1 { padding-bottom: var(--space-xs); }
+      .pb-2 { padding-bottom: var(--space-sm); }
+      .pb-3 { padding-bottom: var(--space-md); }
+      .pb-4 { padding-bottom: var(--space-lg); }
+      .pb-5 { padding-bottom: var(--space-xl); }
 
-        /* Footer */
-        .app-footer {
-            margin-left: var(--sidebar-width);
-            padding: var(--space-lg);
-            background: var(--surface);
-            border-top: 1px solid var(--divider);
-            transition: margin-left var(--transition-base);
-        }
+      .ps-1 { padding-left: var(--space-xs); }
+      .ps-2 { padding-left: var(--space-sm); }
+      .ps-3 { padding-left: var(--space-md); }
+      .ps-4 { padding-left: var(--space-lg); }
+      .ps-5 { padding-left: var(--space-xl); }
 
-        .sidebar.collapsed ~ .app-footer {
-            margin-left: var(--sidebar-collapsed);
-        }
+      .pe-1 { padding-right: var(--space-xs); }
+      .pe-2 { padding-right: var(--space-sm); }
+      .pe-3 { padding-right: var(--space-md); }
+      .pe-4 { padding-right: var(--space-lg); }
+      .pe-5 { padding-right: var(--space-xl); }
 
-        .footer-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+      .gap-1 { gap: var(--space-xs); }
+      .gap-2 { gap: var(--space-sm); }
+      .gap-3 { gap: var(--space-md); }
+      .gap-4 { gap: var(--space-lg); }
+      .gap-5 { gap: var(--space-xl); }
 
-        .footer-links {
-            display: flex;
-            gap: var(--space-lg);
-        }
+      /* Content layout improvements */
+      .page-header {
+        margin-bottom: var(--space-xl);
+      }
 
-        .footer-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.875rem;
-            transition: color var(--transition-fast);
-        }
+      .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: var(--space-sm);
+      }
 
-        .footer-links a:hover {
-            color: var(--primary);
-        }
+      .page-header p {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+      }
 
-        /* Message Cards */
-        .messages-container {
-            margin-bottom: var(--space-lg);
-        }
+      /* Empty state */
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-2xl);
+        text-align: center;
+        color: var(--text-secondary);
+        height: 100%;
+        min-height: 400px;
+      }
 
-        .message-card {
-            animation: slideUp var(--transition-base);
-        }
+      .empty-state i {
+        font-size: 4rem;
+        color: var(--divider);
+        margin-bottom: var(--space-lg);
+      }
 
-        .message-danger {
-            border-left: 4px solid var(--danger);
-        }
+      .empty-state h3 {
+        font-size: 1.25rem;
+        margin-bottom: var(--space-sm);
+        color: var(--text-secondary);
+      }
 
-        .message-success {
-            border-left: 4px solid var(--success);
-        }
+      .empty-state p {
+        margin-bottom: var(--space-lg);
+        max-width: 400px;
+      }
 
-        /* Responsive Design */
-        @media (max-width: 1200px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.show {
-                transform: translateX(0);
-            }
-            
-            .app-header,
-            .main-content,
-            .app-footer {
-                margin-left: 0;
-            }
-            
-            .sidebar-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 999;
-                opacity: 0;
-                visibility: hidden;
-                transition: all var(--transition-base);
-            }
-            
-            .sidebar-overlay.show {
-                opacity: 1;
-                visibility: visible;
-            }
-        }
+      /* Grid System (replacing Bootstrap) */
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 calc(var(--space-md) * -0.5);
+      }
 
-        @media (max-width: 768px) {
-            .search-container {
-                display: none;
-            }
-            
-            .grid-2, .grid-3, .grid-4 {
-                grid-template-columns: 1fr;
-            }
-            
-            .notification-panel,
-            .actions-panel,
-            .user-dropdown {
-                position: fixed;
-                top: var(--header-height);
-                left: 0;
-                right: 0;
-                width: 100%;
-                max-width: 100vw;
-                border-radius: 0;
-                margin: 0;
-            }
-            
-            .modal {
-                width: 95%;
-                max-height: 80vh;
-            }
-            
-            .main-content {
-                padding: var(--space-md);
-            }
-            
-            .submenu {
-                margin-left: calc(var(--space-md) + 24px);
-            }
-        }
+      .col {
+        flex: 1 0 0%;
+        padding: 0 calc(var(--space-md) * 0.5);
+      }
 
-        @media (max-width: 480px) {
-            .header-right {
-                gap: var(--space-sm);
-            }
-            
-            .action-button {
-                width: 36px;
-                height: 36px;
-            }
-            
-            .user-avatar {
-                width: 36px;
-                height: 36px;
-            }
-            
-            .main-content {
-                padding: var(--space-sm);
-            }
-            
-            .footer-content {
-                flex-direction: column;
-                gap: var(--space-md);
-                text-align: center;
-            }
-        }
+      .col-auto {
+        flex: 0 0 auto;
+        width: auto;
+        padding: 0 calc(var(--space-md) * 0.5);
+      }
 
-        /* Animation Classes */
-        .scale-in {
-            animation: scaleIn var(--transition-base);
-        }
+      .col-1 { flex: 0 0 auto; width: 8.33333333%; }
+      .col-2 { flex: 0 0 auto; width: 16.66666667%; }
+      .col-3 { flex: 0 0 auto; width: 25%; }
+      .col-4 { flex: 0 0 auto; width: 33.33333333%; }
+      .col-5 { flex: 0 0 auto; width: 41.66666667%; }
+      .col-6 { flex: 0 0 auto; width: 50%; }
+      .col-7 { flex: 0 0 auto; width: 58.33333333%; }
+      .col-8 { flex: 0 0 auto; width: 66.66666667%; }
+      .col-9 { flex: 0 0 auto; width: 75%; }
+      .col-10 { flex: 0 0 auto; width: 83.33333333%; }
+      .col-11 { flex: 0 0 auto; width: 91.66666667%; }
+      .col-12 { flex: 0 0 auto; width: 100%; }
 
-        .fade-in {
-            animation: fadeIn var(--transition-base);
-        }
+      @media (min-width: 576px) {
+        .col-sm-1 { flex: 0 0 auto; width: 8.33333333%; }
+        .col-sm-2 { flex: 0 0 auto; width: 16.66666667%; }
+        .col-sm-3 { flex: 0 0 auto; width: 25%; }
+        .col-sm-4 { flex: 0 0 auto; width: 33.33333333%; }
+        .col-sm-5 { flex: 0 0 auto; width: 41.66666667%; }
+        .col-sm-6 { flex: 0 0 auto; width: 50%; }
+        .col-sm-7 { flex: 0 0 auto; width: 58.33333333%; }
+        .col-sm-8 { flex: 0 0 auto; width: 66.66666667%; }
+        .col-sm-9 { flex: 0 0 auto; width: 75%; }
+        .col-sm-10 { flex: 0 0 auto; width: 83.33333333%; }
+        .col-sm-11 { flex: 0 0 auto; width: 91.66666667%; }
+        .col-sm-12 { flex: 0 0 auto; width: 100%; }
+      }
 
-        .slide-up {
-            animation: slideUp var(--transition-base);
-        }
+      @media (min-width: 768px) {
+        .col-md-1 { flex: 0 0 auto; width: 8.33333333%; }
+        .col-md-2 { flex: 0 0 auto; width: 16.66666667%; }
+        .col-md-3 { flex: 0 0 auto; width: 25%; }
+        .col-md-4 { flex: 0 0 auto; width: 33.33333333%; }
+        .col-md-5 { flex: 0 0 auto; width: 41.66666667%; }
+        .col-md-6 { flex: 0 0 auto; width: 50%; }
+        .col-md-7 { flex: 0 0 auto; width: 58.33333333%; }
+        .col-md-8 { flex: 0 0 auto; width: 66.66666667%; }
+        .col-md-9 { flex: 0 0 auto; width: 75%; }
+        .col-md-10 { flex: 0 0 auto; width: 83.33333333%; }
+        .col-md-11 { flex: 0 0 auto; width: 91.66666667%; }
+        .col-md-12 { flex: 0 0 auto; width: 100%; }
+      }
 
-        @keyframes scaleIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
+      @media (min-width: 992px) {
+        .col-lg-1 { flex: 0 0 auto; width: 8.33333333%; }
+        .col-lg-2 { flex: 0 0 auto; width: 16.66666667%; }
+        .col-lg-3 { flex: 0 0 auto; width: 25%; }
+        .col-lg-4 { flex: 0 0 auto; width: 33.33333333%; }
+        .col-lg-5 { flex: 0 0 auto; width: 41.66666667%; }
+        .col-lg-6 { flex: 0 0 auto; width: 50%; }
+        .col-lg-7 { flex: 0 0 auto; width: 58.33333333%; }
+        .col-lg-8 { flex: 0 0 auto; width: 66.66666667%; }
+        .col-lg-9 { flex: 0 0 auto; width: 75%; }
+        .col-lg-10 { flex: 0 0 auto; width: 83.33333333%; }
+        .col-lg-11 { flex: 0 0 auto; width: 91.66666667%; }
+        .col-lg-12 { flex: 0 0 auto; width: 100%; }
+      }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Utility Classes */
-        .hidden {
-            display: none !important;
-        }
-
-        .flex {
-            display: flex;
-        }
-
-        .flex-col {
-            flex-direction: column;
-        }
-
-        .items-center {
-            align-items: center;
-        }
-
-        .justify-between {
-            justify-content: space-between;
-        }
-
-        .gap-sm {
-            gap: var(--space-sm);
-        }
-
-        .gap-md {
-            gap: var(--space-md);
-        }
-
-        .gap-lg {
-            gap: var(--space-lg);
-        }
-
-        .w-full {
-            width: 100%;
-        }
-
-        .h-full {
-            height: 100%;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .text-right {
-            text-align: right;
-        }
-
-        .mt-sm { margin-top: var(--space-sm); }
-        .mt-md { margin-top: var(--space-md); }
-        .mt-lg { margin-top: var(--space-lg); }
-        .mb-sm { margin-bottom: var(--space-sm); }
-        .mb-md { margin-bottom: var(--space-md); }
-        .mb-lg { margin-bottom: var(--space-lg); }
-        .p-sm { padding: var(--space-sm); }
-        .p-md { padding: var(--space-md); }
-        .p-lg { padding: var(--space-lg); }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--background);
-            border-radius: var(--radius-full);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--divider);
-            border-radius: var(--radius-full);
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-disabled);
-        }
-
-        /* Print Styles */
-        @media print {
-            .sidebar,
-            .app-header,
-            .app-footer {
-                display: none !important;
-            }
-            
-            .main-content {
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            
-            .card {
-                box-shadow: none !important;
-                border: none !important;
-            }
-        }
+      @media (min-width: 1200px) {
+        .col-xl-1 { flex: 0 0 auto; width: 8.33333333%; }
+        .col-xl-2 { flex: 0 0 auto; width: 16.66666667%; }
+        .col-xl-3 { flex: 0 0 auto; width: 25%; }
+        .col-xl-4 { flex: 0 0 auto; width: 33.33333333%; }
+        .col-xl-5 { flex: 0 0 auto; width: 41.66666667%; }
+        .col-xl-6 { flex: 0 0 auto; width: 50%; }
+        .col-xl-7 { flex: 0 0 auto; width: 58.33333333%; }
+        .col-xl-8 { flex: 0 0 auto; width: 66.66666667%; }
+        .col-xl-9 { flex: 0 0 auto; width: 75%; }
+        .col-xl-10 { flex: 0 0 auto; width: 83.33333333%; }
+        .col-xl-11 { flex: 0 0 auto; width: 91.66666667%; }
+        .col-xl-12 { flex: 0 0 auto; width: 100%; }
+      }
     </style>
 
     {% block internal_style %}{% endblock internal_style %}
-</head>
+  </head>
 
 <body>
+    {% if user.is_authenticated %}
     <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <a href="{% url 'home' %}" class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-church"></i>
-                    </div>
-                    <div class="logo-text">Christ The King</div>
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <a href="{% url 'home' %}" class="logo">
+            <div class="logo-icon">
+              <i class="fas fa-church"></i>
+            </div>
+            <div class="logo-text">Christ The King</div>
+          </a>
+        </div>
+
+        <nav class="sidebar-nav">
+          <div class="nav-scroll-container">
+            <div class="nav-section">
+              <div class="nav-label">Main Menu</div>
+
+              <div class="nav-item">
+                <a href="{% url 'home' %}" class="nav-link {% if home_active %}active{% endif %}">
+                  <div class="nav-icon">
+                    <i class="fas fa-home"></i>
+                  </div>
+                  <div class="nav-text">Dashboard</div>
                 </a>
+              </div>
+
+              <!-- Ministries Dropdown -->
+              <div class="nav-item dropdown-menu">
+                <div class="nav-link nav-toggle {% if ministries_active_add or ministries_active_list %}active{% endif %}" data-target="ministries-submenu">
+                  <div class="nav-icon">
+                    <i class="fas fa-building"></i>
+                  </div>
+                  <div class="nav-text">Ministries</div>
+                  <div class="nav-chevron">
+                    <i class="fas fa-chevron-down"></i>
+                  </div>
+                </div>
+                <div class="submenu" id="ministries-submenu" {% if ministries_active_add or ministries_active_list%} style="max-height: 500px;" {% endif %} >
+                  <a href="{% url 'add_ministry' %}" class="submenu-link {% if ministries_active_add %}active{% endif %}">
+                    <div class="submenu-icon">
+                      <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="submenu-text">Add Ministry</div>
+                  </a>
+                  <a href="{% url 'list_ministries' %}" class="submenu-link {% if ministries_active_list %}active{% endif %}" >
+                    <div class="submenu-icon">
+                      <i class="fas fa-list"></i>
+                    </div>
+                    <div class="submenu-text">List Ministries</div>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Communities Dropdown -->
+              <div class="nav-item dropdown-menu">
+                <div class="nav-link nav-toggle {% if shepherds_active_add or shepherds_active_list %}active{% endif %}" data-target="communities-submenu">
+                  <div class="nav-icon">
+                    <i class="fas fa-people-carry"></i>
+                  </div>
+                  <div class="nav-text">Communities</div>
+                  <div class="nav-chevron">
+                    <i class="fas fa-chevron-down"></i>
+                  </div>
+                </div>
+                <div class="submenu" id="communities-submenu" {% if community_active_add or community_active_list %}style="max-height: 500px;" {% endif %}>
+                  <a href="{% url 'add_community' %}" class="submenu-link {% if shepherds_active_add %}active{% endif %}">
+                    <div class="submenu-icon">
+                      <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="submenu-text">Add Community</div>
+                  </a>
+                  <a href="{% url 'list_community' %}" class="submenu-link {% if shepherds_active_list %}active{% endif %}">
+                    <div class="submenu-icon">
+                      <i class="fas fa-list"></i>
+                    </div>
+                    <div class="submenu-text">List Communities</div>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Members Dropdown -->
+              <div class="nav-item dropdown-menu">
+                <div class="nav-link nav-toggle {% if members_active_list or members_active_add %}active{% endif %}" data-target="members-submenu">
+                  <div class="nav-icon">
+                    <i class="fas fa-users"></i>
+                  </div>
+                  <div class="nav-text">Members</div>
+                  <div class="nav-chevron">
+                    <i class="fas fa-chevron-down"></i>
+                  </div>
+                </div>
+                <div class="submenu" id="members-submenu" {% if members_active_list or members_active_add %}style="max-height: 500px;" {% endif %}>
+                  <a href="{% url 'add_member' %}" class="submenu-link {% if members_active_add %}active{% endif %}">
+                    <div class="submenu-icon">
+                      <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="submenu-text">Add Member</div>
+                  </a>
+                  <a href="{% url 'table_members' %}" class="submenu-link {% if members_active_list %}active{% endif %}">
+                    <div class="submenu-icon">
+                      <i class="fas fa-list"></i>
+                    </div>
+                    <div class="submenu-text">List Members</div>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Finance Dropdown - Only for Admin/Accountant -->
+              {% if user.is_superuser or user.is_staff or user.roles == 'Accountant' %}
+              <div class="nav-item dropdown-menu">
+                <div class="nav-link nav-toggle {% if finance_active or tithepayment_active_list or tithepayment_active_create or tithepayment_active_summary or receipts_active %}active{% endif %}" data-target="finance-submenu">
+                  <div class="nav-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                  </div>
+                  <div class="nav-text">Finance</div>
+                  <div class="nav-chevron">
+                    <i class="fas fa-chevron-down"></i>
+                  </div>
+                </div>
+                <div class="submenu" id="finance-submenu" {% if finance_active or tithepayment_active_list or tithepayment_active_create or tithepayment_active_summary or receipts_active %}style="max-height: 500px;" {% endif %}>
+                  <a href="{% url 'tithepayment:tithepayment_list' %}" class="submenu-link {% if tithepayment_active_list %}active{% endif %}">
+                    <div class="submenu-icon">
+                      <i class="fas fa-list"></i>
+                    </div>
+                    <div class="submenu-text">All Tithe Payments</div>
+                  </a>
+                  <a href="{% url 'tithepayment:tithepayment_create' %}" class="submenu-link {% if tithepayment_active_create %}active{% endif %}">
+                    <div class="submenu-icon">
+                      <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div class="submenu-text">Record Tithe</div>
+                  </a>
+                  <a href="{% url 'tithepayment:receipt_list' %}" class="submenu-link {% if receipts_active %}active{% endif %}">
+                    <div class="submenu-icon">
+                      <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="submenu-text">All Receipts</div>
+                  </a>
+                  <a href="{% url 'tithepayment:tithepayment_summary' %}" class="submenu-link {% if tithepayment_active_summary %}active{% endif %}">
+                    <div class="submenu-icon">
+                      <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="submenu-text">Tithe Reports</div>
+                  </a>
+                </div>
+              </div>
+              {% endif %}
+
+              <!-- Administration Section - Only for Admin -->
+              {% if user.is_superuser  or user.roles == 'admin' or user.is_staff %}
+              <div class="nav-section">
+                <div class="nav-label">Administration</div>
+
+                <!-- Users Management Dropdown -->
+                <div class="nav-item dropdown-menu">
+                  <div class="nav-link nav-toggle {% if users_active_add or users_active_list %}active{% endif %}" data-target="users-submenu">
+                    <div class="nav-icon">
+                      <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="nav-text">User Management</div>
+                    <div class="nav-chevron">
+                      <i class="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                  <div class="submenu" id="users-submenu" {% if users_active_add or users_active_list%} style="max-height: 500px;" {% endif %}>
+                    <a href="{% url 'add_user' %}" class="submenu-link {% if users_active_add %}active{% endif %}">
+                      <div class="submenu-icon">
+                        <i class="fas fa-user-plus"></i>
+                      </div>
+                      <div class="submenu-text">Add New User</div>
+                    </a>
+                    <a href="{% url 'list_users' %}" class="submenu-link {% if users_active_list %}active{% endif %}">
+                      <div class="submenu-icon">
+                        <i class="fas fa-users-cog"></i>
+                      </div>
+                      <div class="submenu-text">Manage Users</div>
+                    </a>
+                    <a href="{% url 'role_management' %}" class="submenu-link {% if roles_active %}active{% endif %}">
+                      <div class="submenu-icon">
+                        <i class="fas fa-user-tag"></i>
+                      </div>
+                      <div class="submenu-text">Role Management</div>
+                    </a>
+                  </div>
+                </div>
+
+                <!-- System Settings Dropdown -->
+                <div class="nav-item dropdown-menu">
+                  <div class="nav-link nav-toggle {% if settings_active %}active{% endif %}" data-target="settings-submenu">
+                    <div class="nav-icon">
+                      <i class="fas fa-cogs"></i>
+                    </div>
+                    <div class="nav-text">System Settings</div>
+                    <div class="nav-chevron">
+                      <i class="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                  <div class="submenu" id="settings-submenu" {% if settings_active %} style="max-height: 500px;" {% endif %}>
+                    <a href="" class="submenu-link {% if system_settings_active %}active{% endif %}">
+                      <div class="submenu-icon">
+                        <i class="fas fa-sliders-h"></i>
+                      </div>
+                      <div class="submenu-text">General Settings</div>
+                    </a>
+                    <a href="" class="submenu-link {% if audit_logs_active %}active{% endif %}">
+                      <div class="submenu-icon">
+                        <i class="fas fa-history"></i>
+                      </div>
+                      <div class="submenu-text">Audit Logs</div>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
             </div>
 
-            <nav class="sidebar-nav">
-                <div class="nav-section">
-                    <div class="nav-label">Menu</div>
-                    
-                    <div class="nav-item">
-                        <a href="{% url 'home' %}" class="nav-link {% if home_active %}active{% endif %}">
-                            <div class="nav-icon">
-                                <i class="fas fa-home"></i>
-                            </div>
-                            <div class="nav-text">Home</div>
-                        </a>
-                    </div>
+            <!-- Quick Actions - Conditional based on role -->
+            {% if user.is_superuser or user.is_staff or user.roles == 'accountant' %}
+            <div class="nav-section">
+              <div class="nav-label">Quick Actions</div>
 
-                    <!-- Ministries Dropdown -->
-                    <div class="nav-item dropdown-menu">
-                        <div class="nav-link nav-toggle {% if ministries_active_add or ministries_active_list %}active{% endif %}" data-target="ministries-submenu">
-                            <div class="nav-icon">
-                                <i class="fas fa-building"></i>
-                            </div>
-                            <div class="nav-text">Ministries</div>
-                            <div class="nav-badge">6</div>
-                            <div class="nav-chevron">
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                        </div>
-                        <div class="submenu" id="ministries-submenu" {% if ministries_active_add or ministries_active_list %}style="max-height: 500px;"{% endif %}>
-                            <a href="{% url 'add_ministry' %}" class="submenu-link {% if ministries_active_add %}active{% endif %}">
-                                <div class="submenu-icon">
-                                    <i class="fas fa-plus"></i>
-                                </div>
-                                <div class="submenu-text">Add Ministry</div>
-                            </a>
-                            <a href="{% url 'list_ministries' %}" class="submenu-link {% if ministries_active_list %}active{% endif %}">
-                                <div class="submenu-icon">
-                                    <i class="fas fa-list"></i>
-                                </div>
-                                <div class="submenu-text">List Ministries</div>
-                            </a>
-                        </div>
-                    </div>
+              <div class="nav-item">
+                <a href="{% url 'tithepayment:tithepayment_create' %}" class="nav-link">
+                  <div class="nav-icon" style="color: var(--warning)">
+                    <i class="fas fa-plus-circle"></i>
+                  </div>
+                  <div class="nav-text">Quick Tithe Entry</div>
+                </a>
+              </div>
+              {% endif %}
 
-                    <!-- Communities Dropdown -->
-                    <div class="nav-item dropdown-menu">
-                        <div class="nav-link nav-toggle {% if shepherds_active_add or shepherds_active_list %}active{% endif %}" data-target="communities-submenu">
-                            <div class="nav-icon">
-                                <i class="fas fa-people-carry"></i>
-                            </div>
-                            <div class="nav-text">Communities</div>
-                            <div class="nav-chevron">
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                        </div>
-                        <div class="submenu" id="communities-submenu" {% if shepherds_active_add or shepherds_active_list %}style="max-height: 500px;"{% endif %}>
-                            <a href="{% url 'add_shepherd' %}" class="submenu-link {% if shepherds_active_add %}active{% endif %}">
-                                <div class="submenu-icon">
-                                    <i class="fas fa-plus"></i>
-                                </div>
-                                <div class="submenu-text">Add Community</div>
-                            </a>
-                            <a href="{% url 'list_shepherds' %}" class="submenu-link {% if shepherds_active_list %}active{% endif %}">
-                                <div class="submenu-icon">
-                                    <i class="fas fa-list"></i>
-                                </div>
-                                <div class="submenu-text">List Communities</div>
-                            </a>
-                        </div>
-                    </div>
+              <div class="nav-item">
+                <a href="{% url 'add_member' %}" class="nav-link">
+                  <div class="nav-icon" style="color: var(--success)">
+                    <i class="fas fa-user-plus"></i>
+                  </div>
+                  <div class="nav-text">Add New Member</div>
+                </a>
+              </div>
+
+              {% if user.is_superuser or user.is_staff or user.roles == 'Accountant' %}
+              <div class="nav-item">
+                <a href="{% url 'tithepayment:receipt_list' %}" class="nav-link">
+                  <div class="nav-icon" style="color: var(--info)">
+                    <i class="fas fa-print"></i>
+                  </div>
+                  <div class="nav-text">Print Receipts</div>
+                </a>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Sidebar Footer - AVAILABLE TO ALL USERS -->
+          <div class="sidebar-footer">
+            <div class="user-info">
+              <div class="user-avatar-sm">
+                <img src="{% if profile and profile.picture %}{{ profile.picture.url }}{% else %}{% static 'assets/images/avatar01.png' %}{% endif %}" alt="{{ user.username }}" />
+              </div>
+              <div class="user-details">
+                <div class="user-name">
+                  {{ user.get_full_name|default:user.username }}
                 </div>
-
-                <div class="nav-divider"></div>
-
-                <div class="nav-section">
-                    <div class="nav-label">Features</div>
-                    
-                    <!-- Members Dropdown -->
-                    <div class="nav-item dropdown-menu">
-                        <div class="nav-link nav-toggle {% if members_active_list or members_active_add %}active{% endif %}" data-target="members-submenu">
-                            <div class="nav-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="nav-text">Members</div>
-                            <div class="nav-chevron">
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                        </div>
-                        <div class="submenu" id="members-submenu" {% if members_active_list or members_active_add %}style="max-height: 500px;"{% endif %}>
-                            <a href="{% url 'add_member' %}" class="submenu-link {% if members_active_add %}active{% endif %}">
-                                <div class="submenu-icon">
-                                    <i class="fas fa-plus"></i>
-                                </div>
-                                <div class="submenu-text">Add Member</div>
-                            </a>
-                            <a href="{% url 'table_members' %}" class="submenu-link {% if members_active_list %}active{% endif %}">
-                                <div class="submenu-icon">
-                                    <i class="fas fa-list"></i>
-                                </div>
-                                <div class="submenu-text">List Members</div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Finance & Tithe Dropdown -->
-                    <div class="nav-item dropdown-menu">
-                        <div class="nav-link nav-toggle {% if finance_active or tithepayment_active_list or tithepayment_active_create or tithepayment_active_summary or receipts_active %}active{% endif %}" data-target="finance-submenu">
-                            <div class="nav-icon">
-                                <i class="fas fa-money-bill-wave"></i>
-                            </div>
-                            <div class="nav-text">Finance & Tithe</div>
-                            <div class="nav-chevron">
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                        </div>
-                        <div class="submenu" id="finance-submenu" {% if finance_active or tithepayment_active_list or tithepayment_active_create or tithepayment_active_summary or receipts_active %}style="max-height: 500px;"{% endif %}>
-                            <!-- Tithe Payments Section -->
-                            <div class="nav-divider"></div>
-                            <a href="{% url 'tithepayment:tithepayment_list' %}" class="submenu-link {% if tithepayment_active_list %}active{% endif %}">
-                                <div class="submenu-icon">
-                                    <i class="fas fa-list"></i>
-                                </div>
-                                <div class="submenu-text">All Tithe Payments</div>
-                            </a>
-                            <a href="{% url 'tithepayment:tithepayment_create' %}" class="submenu-link {% if tithepayment_active_create %}active{% endif %}">
-                                <div class="submenu-icon">
-                                    <i class="fas fa-plus-circle"></i>
-                                </div>
-                                <div class="submenu-text">Record Tithe</div>
-                            </a>
-                            
-                            <!-- Receipts Section -->
-                            <div class="nav-divider"></div>
-                            <a href="{% url 'tithepayment:receipt_list' %}" class="submenu-link {% if receipts_active %}active{% endif %}">
-                                <div class="submenu-icon">
-                                    <i class="fas fa-receipt"></i>
-                                </div>
-                                <div class="submenu-text">All Receipts</div>
-                                <div class="nav-badge badge-warning" id="unprinted-count">0</div>
-                            </a>
-                            <a href="{% url 'tithepayment:receipt_list' %}" class="submenu-link">
-                                <div class="submenu-icon">
-                                    <i class="fas fa-print"></i>
-                                </div>
-                                <div class="submenu-text">Unprinted Receipts</div>
-                                <div class="nav-badge badge-danger" id="pending-print-count">0</div>
-                            </a>
-                            
-                            <!-- Reports Section -->
-                            <div class="nav-divider"></div>
-                            <a href="{% url 'tithepayment:tithepayment_summary' %}" class="submenu-link {% if tithepayment_active_summary %}active{% endif %}">
-                                <div class="submenu-icon">
-                                    <i class="fas fa-chart-bar"></i>
-                                </div>
-                                <div class="submenu-text">Tithe Reports</div>
-                            </a>
-                            <a href="{% url 'tithepayment:monthly_report' %}" class="submenu-link {% if tithepayment_active_monthly %}active{% endif %}">
-                                <div class="submenu-icon">
-                                    <i class="fas fa-calendar-alt"></i>
-                                </div>
-                                <div class="submenu-text">Monthly Reports</div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Information Center Dropdown -->
-                    <div class="nav-item dropdown-menu">
-                        <div class="nav-link nav-toggle" data-target="information-submenu">
-                            <div class="nav-icon">
-                                <i class="fas fa-info-circle"></i>
-                            </div>
-                            <div class="nav-text">Information Center</div>
-                            <div class="nav-chevron">
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                        </div>
-                        <div class="submenu" id="information-submenu">
-                            <a href="#" class="submenu-link">
-                                <div class="submenu-icon">
-                                    <i class="fas fa-sms"></i>
-                                </div>
-                                <div class="submenu-text">Notice (SMS)</div>
-                            </a>
-                            <a href="#" class="submenu-link">
-                                <div class="submenu-icon">
-                                    <i class="fas fa-bell"></i>
-                                </div>
-                                <div class="submenu-text">Reminders</div>
-                            </a>
-                            <a href="#" class="submenu-link">
-                                <div class="submenu-icon">
-                                    <i class="fas fa-bullhorn"></i>
-                                </div>
-                                <div class="submenu-text">Announcements</div>
-                            </a>
-                        </div>
-                    </div>
+                <div class="user-role">
+                  {% if user.is_superuser %}Administrator 
+                  {% elif user.roles == 'Accountant' %}Accountant
+                  {% elif user.roles == 'Admin' %} Admin
+                  {% elif user.is_staff %}Staff 
+                  {% else %}Member {% endif %}
                 </div>
-
-                <div class="nav-divider"></div>
-
-                <div class="nav-section">
-                    <div class="nav-label">Quick Actions</div>
-                    
-                    <div class="nav-item">
-                        <a href="{% url 'tithepayment:tithepayment_create' %}" class="nav-link {% if tithepayment_active_create %}active{% endif %}">
-                            <div class="nav-icon" style="color: var(--warning);">
-                                <i class="fas fa-plus-circle"></i>
-                            </div>
-                            <div class="nav-text">Quick Tithe Entry</div>
-                        </a>
-                    </div>
-                    
-                    <div class="nav-item">
-                        <a href="{% url 'tithepayment:receipt_list' %}" class="nav-link {% if receipts_active %}active{% endif %}">
-                            <div class="nav-icon" style="color: var(--info);">
-                                <i class="fas fa-receipt"></i>
-                            </div>
-                            <div class="nav-text">Today's Receipts</div>
-                        </a>
-                    </div>
-
-                    <div class="nav-item">
-                        <a href="{% url 'tithepayment:receipt_list' %}" class="nav-link">
-                            <div class="nav-icon" style="color: var(--danger);">
-                                <i class="fas fa-print"></i>
-                            </div>
-                            <div class="nav-text">Print Pending</div>
-                        </a>
-                    </div>
-                </div>
-            </nav>
-        </aside>
-
-        <!-- Overlay for mobile sidebar -->
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-        <!-- Main Content Area -->
-        <div class="main-content-wrapper">
-            <!-- Header -->
-            <header class="app-header">
-                <div class="header-left">
-                    <button class="menu-toggle" id="menuToggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    
-                    <div class="search-container">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" class="search-input" placeholder="Search members, tithe, reports...">
-                    </div>
-                </div>
-
-                <div class="header-right">
-                    <div class="header-actions">
-                        <button class="action-button has-notification" id="notificationButton">
-                            <i class="fas fa-bell"></i>
-                        </button>
-                        
-                        <button class="action-button" id="actionsButton">
-                            <i class="fas fa-th"></i>
-                        </button>
-                        
-                        <div class="user-menu">
-                            <div class="user-avatar" id="userMenuButton">
-                                <img src="{% if profile %}{{ profile.picture.url }}{% else %}{% static 'assets/images/avatar01.png' %}{% endif %}" alt="User Avatar">
-                            </div>
-                            
-                            <div class="user-dropdown" id="userDropdown">
-                                <div class="dropdown-header">
-                                    <h4>{{ user | capfirst }}</h4>
-                                    <p>Welcome back!</p>
-                                </div>
-                                
-                                <a href="{% url 'user_profile' %}" class="dropdown-item">
-                                    <i class="fas fa-user"></i>
-                                    <span>My Account</span>
-                                </a>
-                                
-                                {% if user.is_superuser %}
-                                <a href="{% url 'admin:index' %}" class="dropdown-item">
-                                    <i class="fas fa-cog"></i>
-                                    <span>Admin Panel</span>
-                                </a>
-                                {% endif %}
-                                
-                                <div class="dropdown-footer">
-                                    <button class="btn btn-outline" id="logoutButton">
-                                        <i class="fas fa-power-off"></i>
-                                        <span>Logout</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Notification Panel -->
-            <div class="notification-panel" id="notificationPanel">
-                <div class="notification-header">
-                    <h4 class="card-title">Notifications</h4>
-                    <button class="btn btn-icon" id="markAllRead">
-                        <i class="fas fa-check-double"></i>
-                    </button>
-                </div>
-                
-                <div class="notification-list">
-                    <div class="notification-item unread">
-                        <div class="notification-avatar">
-                            <img src="{% static 'assets/images/avatar-2.jpg' %}" alt="Finance">
-                        </div>
-                        <div class="notification-content">
-                            <div class="notification-title">Finance Alert</div>
-                            <div class="notification-message">Tithe report ready for review</div>
-                            <div class="notification-time">10 min ago</div>
-                        </div>
-                    </div>
-                    
-                    <div class="notification-item">
-                        <div class="notification-avatar">
-                            <img src="{% static 'assets/images/avatar-3.jpg' %}" alt="Budget">
-                        </div>
-                        <div class="notification-content">
-                            <div class="notification-title">Budget Update</div>
-                            <div class="notification-message">Monthly budget 80% utilized</div>
-                            <div class="notification-time">3 days ago</div>
-                        </div>
-                    </div>
-                    
-                    <div class="notification-item">
-                        <div class="notification-avatar">
-                            <img src="{% static 'assets/images/avatar-4.jpg' %}" alt="New Tithe">
-                        </div>
-                        <div class="notification-content">
-                            <div class="notification-title">New Tithe</div>
-                            <div class="notification-message">5 new tithe payments today</div>
-                            <div class="notification-time">5 min ago</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="notification-footer">
-                    <a href="{% url 'tithepayment:tithepayment_list' %}" class="btn btn-outline">View All Notifications</a>
-                </div>
+              </div>
             </div>
 
-            <!-- Quick Actions Panel -->
-            <div class="actions-panel" id="actionsPanel">
-                <div class="actions-grid">
-                    <a href="{% url 'tithepayment:tithepayment_list' %}" class="action-tile">
-                        <i class="fas fa-money-bill-wave"></i>
-                        <span>Tithe</span>
-                    </a>
-                    
-                    <a href="{% url 'list_ministries' %}" class="action-tile">
-                        <i class="fas fa-building"></i>
-                        <span>Ministries</span>
-                    </a>
-                    
-                    <a href="{% url 'list_shepherds' %}" class="action-tile">
-                        <i class="fas fa-people-carry"></i>
-                        <span>Shepherds</span>
-                    </a>
-                    
-                    <a href="{% url 'table_members' %}" class="action-tile">
-                        <i class="fas fa-users"></i>
-                        <span>Members</span>
-                    </a>
-                    
-                    <a href="{% url 'tithepayment:tithepayment_create' %}" class="action-tile">
-                        <i class="fas fa-plus-circle"></i>
-                        <span>Add Tithe</span>
-                    </a>
-                    
-                    <a href="{% url 'tithepayment:tithepayment_summary' %}" class="action-tile">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Reports</span>
-                    </a>
-                </div>
-                
-                <div class="actions-footer">
-                    <a href="{% url 'tithepayment:tithepayment_list' %}" class="btn btn-outline">More Finance Options</a>
-                </div>
-            </div>
+            <!-- LOGOUT BUTTON - AVAILABLE TO ALL USERS -->
+            <button class="logout-btn" id="sidebarLogoutBtn">
+              <i class="fas fa-power-off"></i>
+              <span>Logout</span>
+            </button>
+          </div>
+        </nav>
+      </aside>
 
-            <!-- Main Content -->
-            <main class="main-content">
-                {% if messages %}
-                <div class="messages-container">
-                    {% for message in messages %}
-                    <div class="card mb-md message-card {% if message.tags == 'alert-danger' %}message-danger{% else %}message-success{% endif %}">
-                        <div class="card-header">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-sm">
-                                    {% if message.tags == "alert-danger" %}
-                                    <i class="fas fa-exclamation-triangle text-danger"></i>
-                                    <span class="text-title">Alert</span>
-                                    {% else %}
-                                    <i class="fas fa-check-circle text-success"></i>
-                                    <span class="text-title">Success</span>
-                                    {% endif %}
-                                </div>
-                                <button class="btn btn-icon close-message">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <p class="text-body">{{ message }}</p>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
+      <!-- Overlay for mobile sidebar -->
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-                {% block content %}
-                <!-- Page-specific content goes here -->
-                {% endblock content %}
-            </main>
-
-            <!-- Footer -->
-            <footer class="app-footer">
-                <div class="footer-content">
-                    <p class="text-caption">Copyright © 2025 <b class="text-warning">Christ The King Church</b>. All Rights Reserved.</p>
-                    
-                    <div class="footer-links">
-                        <a href="{% url 'tithepayment:tithepayment_list' %}">Finance</a>
-                        <a href="{% url 'admin:index' %}">Admin</a>
-                        <a href="javascript:void(0);">Support</a>
-                    </div>
-                </div>
-            </footer>
+      <!-- Header -->
+      <header class="app-header">
+        <div class="header-left">
+          <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h3 style="font-weight: 600; color: var(--primary)">
+            {% if user.is_superuser %}Admin Dashboard
+            {% elif user.groups.all.0.name == 'Accountant' %}Dashboard
+            {% else %}Member Dashboard {% endif %}
+          </h3>
         </div>
-    </div>
 
-    <!-- Logout Modal -->
+        <div class="header-right">
+          <!-- Notification Dropdown -->
+          <div class="notification-dropdown">
+            <button class="notification-btn" id="notificationBtn">
+              <i class="fas fa-bell"></i>
+              {% if unread_count > 0 %}
+              <span class="notification-badge">{{ unread_count }}</span>
+              {% endif %}
+            </button>
+            
+            <div class="notification-dropdown-content" id="notificationDropdown">
+              <!-- Header -->
+              <div class="notification-header">
+                <div class="notification-title">
+                  <h3>Notifications</h3>
+                  <span class="unread-count">{{ unread_count }} unread</span>
+                  {% if user.is_superuser or user.is_staff or user.groups.all.0.name == 'Admin' %}
+                </div>
+                <a href="{% url 'notification-dashboard' %}" class="mark-all-read">Dashboard</a>
+              </div>
+              {% endif %}
+              <div>
+                <a href="{% url 'mark-all-read' %}" class="mark-all-read" style="float: right; margin-right: 16px; margin-top: -28px;">Mark all read</a>
+              </div>
+              
+              <!-- Notifications List -->
+              <div class="notification-list" id="notificationList">
+                <!-- Will be populated by JavaScript -->
+                <div class="notification-loading">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <p>Loading notifications...</p>
+                </div>
+              </div>
+              
+              <!-- Footer -->
+              <div class="notification-footer">
+                <a href="{% url 'notification-list' %}">View all notifications</a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- User Menu -->
+          <div class="user-menu">
+            <div class="user-avatar-sm" id="userMenuButton">
+              <img src="{% if profile and profile.picture %}{{ profile.picture.url }}{% else %}{% static 'assets/images/avatar01.png' %}{% endif %}" alt="{{ user.username }}" />
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        {% block content %}
+        <!-- Page-specific content goes here -->
+        {% endblock content %}
+      </main>
+    </div>
+    {% else %}
+    <!-- Redirect to login if not authenticated -->
+    <script>
+      window.location.href = "{% url '_login' %}";
+    </script>
+    {% endif %}
+
+    <!-- LOGOUT MODAL - AVAILABLE TO ALL AUTHENTICATED USERS -->
+    {% if user.is_authenticated %}
     <div class="modal-overlay" id="logoutModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h4 class="card-title">Ready to Leave?</h4>
-                <button class="btn btn-icon close-modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <p class="text-body">Select "Logout" below if you are ready to end your current session.</p>
-            </div>
-            
-            <div class="modal-footer">
-                <button class="btn btn-outline close-modal">Cancel</button>
-                <a href="{% url '_logout' %}" class="btn btn-primary">Logout</a>
-            </div>
+      <div class="modal">
+        <div class="modal-header">
+          <h3 style="font-weight: 600">Confirm Logout</h3>
+          <button class="close-modal" style="background: none; border: none; cursor: pointer">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
+        <div class="modal-body">
+          <p>Are you sure you want to logout?</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" id="cancelLogout">
+            Cancel
+          </button>
+          <form method="post" action="{% url '_logout' %}" id="logoutForm" style="display: inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+              Logout
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
+    {% endif %}
 
     <!-- JavaScript -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // DOM Elements
-            const sidebar = document.getElementById('sidebar');
-            const menuToggle = document.getElementById('menuToggle');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
-            const notificationButton = document.getElementById('notificationButton');
-            const notificationPanel = document.getElementById('notificationPanel');
-            const actionsButton = document.getElementById('actionsButton');
-            const actionsPanel = document.getElementById('actionsPanel');
-            const userMenuButton = document.getElementById('userMenuButton');
-            const userDropdown = document.getElementById('userDropdown');
-            const logoutButton = document.getElementById('logoutButton');
-            const logoutModal = document.getElementById('logoutModal');
-            const closeButtons = document.querySelectorAll('.close-modal, .close-message');
-            
-            // Mobile sidebar toggle
-            menuToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('show');
-                sidebarOverlay.classList.toggle('show');
+      document.addEventListener('DOMContentLoaded', function() {
+          // Redirect if not authenticated
+          {% if not user.is_authenticated %}
+          window.location.href = "{% url '_login' %}";
+          return;
+          {% endif %}
+
+          // DOM Elements
+          const sidebar = document.getElementById('sidebar');
+          const menuToggle = document.getElementById('menuToggle');
+          const sidebarOverlay = document.getElementById('sidebarOverlay');
+          const logoutModal = document.getElementById('logoutModal');
+          const logoutForm = document.getElementById('logoutForm');
+          const cancelLogout = document.getElementById('cancelLogout');
+          const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
+          const closeButtons = document.querySelectorAll('.close-modal, .close-message');
+          const notificationBtn = document.getElementById('notificationBtn');
+          const notificationDropdown = document.getElementById('notificationDropdown');
+          const notificationList = document.getElementById('notificationList');
+
+          // Mobile sidebar toggle
+          menuToggle.addEventListener('click', () => {
+              sidebar.classList.toggle('show');
+              sidebarOverlay.classList.toggle('show');
+          });
+
+          // Close sidebar when clicking on overlay
+          sidebarOverlay.addEventListener('click', () => {
+              sidebar.classList.remove('show');
+              sidebarOverlay.classList.remove('show');
+          });
+
+          // Logout button click - AVAILABLE TO ALL
+          if (sidebarLogoutBtn) {
+            sidebarLogoutBtn.addEventListener('click', () => {
+                logoutModal.classList.add('show');
             });
-            
-            // Close sidebar when clicking on overlay
-            sidebarOverlay.addEventListener('click', () => {
-                sidebar.classList.remove('show');
-                sidebarOverlay.classList.remove('show');
+          }
+
+          // Cancel logout
+          if (cancelLogout) {
+            cancelLogout.addEventListener('click', () => {
+                logoutModal.classList.remove('show');
             });
-            
-            // Toggle notification panel
-            notificationButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                notificationPanel.classList.toggle('show');
-                actionsPanel.classList.remove('show');
-                userDropdown.classList.remove('show');
-            });
-            
-            // Toggle actions panel
-            actionsButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                actionsPanel.classList.toggle('show');
-                notificationPanel.classList.remove('show');
-                userDropdown.classList.remove('show');
-            });
-            
-            // Toggle user dropdown
-            userMenuButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                userDropdown.classList.toggle('show');
-                notificationPanel.classList.remove('show');
-                actionsPanel.classList.remove('show');
-            });
-            
-            // Show logout modal
-            if (logoutButton) {
-                logoutButton.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    logoutModal.classList.add('show');
-                    userDropdown.classList.remove('show');
-                });
-            }
-            
-            // Close modals and dropdowns when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!notificationPanel.contains(e.target) && !notificationButton.contains(e.target)) {
-                    notificationPanel.classList.remove('show');
-                }
-                
-                if (!actionsPanel.contains(e.target) && !actionsButton.contains(e.target)) {
-                    actionsPanel.classList.remove('show');
-                }
-                
-                if (!userDropdown.contains(e.target) && !userMenuButton.contains(e.target)) {
-                    userDropdown.classList.remove('show');
-                }
-            });
-            
-            // Close modal buttons
-            closeButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const modal = this.closest('.modal-overlay, .message-card');
-                    if (modal) modal.classList.remove('show');
-                });
-            });
-            
-            // Close logout modal with overlay click
+          }
+
+          // Close modal when clicking outside
+          if (logoutModal) {
             logoutModal.addEventListener('click', (e) => {
                 if (e.target === logoutModal) {
                     logoutModal.classList.remove('show');
                 }
             });
-            
-            // Toggle sidebar dropdown menus
-            const navToggles = document.querySelectorAll('.nav-toggle');
-            navToggles.forEach(toggle => {
-                toggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    const targetId = this.getAttribute('data-target');
-                    const submenu = document.getElementById(targetId);
-                    
-                    if (submenu) {
-                        const isOpen = submenu.style.maxHeight && submenu.style.maxHeight !== '0px';
-                        
-                        // Close all other submenus first
-                        document.querySelectorAll('.submenu').forEach(menu => {
-                            if (menu.id !== targetId) {
-                                menu.style.maxHeight = '0px';
-                                const otherToggle = menu.parentElement.querySelector('.nav-toggle');
-                                if (otherToggle) otherToggle.classList.remove('active');
-                            }
-                        });
-                        
-                        // Toggle current submenu
-                        if (isOpen) {
-                            submenu.style.maxHeight = '0px';
-                            this.classList.remove('active');
-                        } else {
-                            submenu.style.maxHeight = submenu.scrollHeight + 'px';
-                            this.classList.add('active');
-                        }
+          }
+
+          // Close message buttons
+          closeButtons.forEach(button => {
+              button.addEventListener('click', function() {
+                  const messageCard = this.closest('.message-card');
+                  if (messageCard) messageCard.style.display = 'none';
+
+                  // If it's a modal close button
+                  if (this.classList.contains('close-modal')) {
+                      logoutModal.classList.remove('show');
+                  }
+              });
+          });
+
+          // Notification functionality
+          if (notificationBtn && notificationDropdown) {
+              // Toggle notification dropdown
+              notificationBtn.addEventListener('click', function(e) {
+                  e.stopPropagation();
+                  notificationDropdown.classList.toggle('show');
+                  
+                  // Fetch notifications if dropdown is opened
+                  if (notificationDropdown.classList.contains('show')) {
+                      fetchNotifications();
+                  }
+              });
+              
+              // Close dropdown when clicking outside
+              document.addEventListener('click', function(e) {
+                  if (notificationDropdown && !notificationDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
+                      notificationDropdown.classList.remove('show');
+                  }
+              });
+          }
+
+          // Handle form submission - AVAILABLE TO ALL
+          if (logoutForm) {
+            logoutForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Show loading state
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging out...';
+                submitBtn.disabled = true;
+
+                // Submit form
+                fetch(this.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': this.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(new FormData(this))
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Redirect to login page
+                        window.location.href = "{% url '_login' %}";
+                    } else {
+                        // Handle error
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        alert('Logout failed. Please try again.');
                     }
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    alert('Network error. Please try again.');
                 });
             });
-            
-            // Mark all notifications as read
-            const markAllRead = document.getElementById('markAllRead');
-            if (markAllRead) {
-                markAllRead.addEventListener('click', () => {
-                    document.querySelectorAll('.notification-item.unread').forEach(item => {
-                        item.classList.remove('unread');
-                    });
-                    notificationButton.classList.remove('has-notification');
-                });
-            }
-            
-            // Search functionality
-            const searchInput = document.querySelector('.search-input');
-            if (searchInput) {
-                searchInput.addEventListener('input', debounce(function(e) {
-                    // Implement search functionality here
-                    console.log('Searching for:', e.target.value);
-                }, 300));
-            }
-            
-            // Debounce function for search
-            function debounce(func, wait) {
-                let timeout;
-                return function executedFunction(...args) {
-                    const later = () => {
-                        clearTimeout(timeout);
-                        func(...args);
-                    };
-                    clearTimeout(timeout);
-                    timeout = setTimeout(later, wait);
-                };
-            }
-            
-            // Update receipt counts
-            function updateReceiptCounts() {
-                // Example: Fetch counts via AJAX
-                fetch('{% url "tithepayment:receipt_list" %}?ajax_counts=true')
-                    .then(response => response.json())
-                    .then(data => {
-                        const unprintedCount = document.getElementById('unprinted-count');
-                        const pendingPrintCount = document.getElementById('pending-print-count');
-                        if (unprintedCount && data.unprinted_count !== undefined) {
-                            unprintedCount.textContent = data.unprinted_count;
-                        }
-                        if (pendingPrintCount && data.unprinted_count !== undefined) {
-                            pendingPrintCount.textContent = data.unprinted_count;
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching receipt counts:', error);
-                    });
-            }
-            
-            // Initial update of receipt counts
-            updateReceiptCounts();
-            
-            // Update counts every 30 seconds
-            setInterval(updateReceiptCounts, 30000);
-            
-            // Handle window resize
-            let resizeTimer;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(() => {
-                    if (window.innerWidth >= 1200) {
-                        sidebar.classList.remove('show');
-                        sidebarOverlay.classList.remove('show');
-                    }
-                    
-                    // Close all dropdowns on mobile when resizing
-                    if (window.innerWidth < 768) {
-                        document.querySelectorAll('.submenu').forEach(menu => {
-                            menu.style.maxHeight = '0px';
-                        });
-                        document.querySelectorAll('.nav-toggle').forEach(toggle => {
-                            toggle.classList.remove('active');
-                        });
-                    }
-                }, 250);
-            });
-            
-            // Initialize active states for sidebar
-            function setActiveMenu() {
-                const currentUrl = window.location.pathname;
-                const navLinks = document.querySelectorAll('.nav-link, .submenu-link');
-                
-                // First remove all active classes
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                });
-                
-                // Find and activate current page link
-                navLinks.forEach(link => {
-                    const href = link.getAttribute('href');
-                    if (href && currentUrl.includes(href)) {
-                        link.classList.add('active');
-                        
-                        // Open parent submenu if exists
-                        const submenu = link.closest('.submenu');
-                        if (submenu) {
-                            submenu.style.maxHeight = submenu.scrollHeight + 'px';
-                            const toggle = submenu.parentElement.querySelector('.nav-toggle');
-                            if (toggle) toggle.classList.add('active');
-                        }
-                    }
-                });
-                
-                // Special handling for finance section
-                if (currentUrl.includes('tithepayment')) {
-                    const financeSubmenu = document.getElementById('finance-submenu');
-                    const financeToggle = document.querySelector('.nav-toggle[data-target="finance-submenu"]');
-                    if (financeSubmenu && financeToggle) {
-                        financeSubmenu.style.maxHeight = financeSubmenu.scrollHeight + 'px';
-                        financeToggle.classList.add('active');
-                    }
-                }
-            }
-            
-            // Initialize active menu on page load
-            setActiveMenu();
-            
-            // Handle keyboard navigation
-            document.addEventListener('keydown', (e) => {
-                // Escape key closes all dropdowns and modals
-                if (e.key === 'Escape') {
-                    notificationPanel.classList.remove('show');
-                    actionsPanel.classList.remove('show');
-                    userDropdown.classList.remove('show');
-                    logoutModal.classList.remove('show');
-                    
-                    // Close sidebar on mobile
-                    if (window.innerWidth < 1200) {
-                        sidebar.classList.remove('show');
-                        sidebarOverlay.classList.remove('show');
-                    }
-                }
-                
-                // Ctrl+K or Cmd+K for search
-                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                    e.preventDefault();
-                    if (searchInput) searchInput.focus();
-                }
-            });
-        });
+          }
+
+          // Toggle sidebar dropdown menus
+          const navToggles = document.querySelectorAll('.nav-toggle');
+          navToggles.forEach(toggle => {
+              toggle.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+
+                  const targetId = this.getAttribute('data-target');
+                  const submenu = document.getElementById(targetId);
+
+                  if (submenu) {
+                      const isOpen = submenu.style.maxHeight && submenu.style.maxHeight !== '0px';
+
+                      // Close all other submenus first
+                      document.querySelectorAll('.submenu').forEach(menu => {
+                          if (menu.id !== targetId) {
+                              menu.style.maxHeight = '0px';
+                              const otherToggle = menu.parentElement.querySelector('.nav-toggle');
+                              if (otherToggle) otherToggle.classList.remove('active');
+                          }
+                      });
+
+                      // Toggle current submenu
+                      if (isOpen) {
+                          submenu.style.maxHeight = '0px';
+                          this.classList.remove('active');
+                      } else {
+                          submenu.style.maxHeight = submenu.scrollHeight + 'px';
+                          this.classList.add('active');
+                      }
+                  }
+              });
+          });
+
+          // Set active menu based on current URL
+          function setActiveMenu() {
+              const currentUrl = window.location.pathname;
+              const navLinks = document.querySelectorAll('.nav-link, .submenu-link');
+
+              // Remove all active classes
+              navLinks.forEach(link => link.classList.remove('active'));
+
+              // Find and activate current page link
+              navLinks.forEach(link => {
+                  const href = link.getAttribute('href');
+                  if (href && currentUrl.startsWith(href)) {
+                      link.classList.add('active');
+
+                      // Open parent submenu if exists
+                      const submenu = link.closest('.submenu');
+                      if (submenu) {
+                          submenu.style.maxHeight = submenu.scrollHeight + 'px';
+                          const toggle = submenu.parentElement.querySelector('.nav-toggle');
+                          if (toggle) toggle.classList.add('active');
+                      }
+                  }
+              });
+          }
+
+          // Initialize active menu
+          setActiveMenu();
+
+          // Handle window resize
+          window.addEventListener('resize', () => {
+              if (window.innerWidth >= 1200) {
+                  sidebar.classList.remove('show');
+                  sidebarOverlay.classList.remove('show');
+              }
+              
+              // Fix content positioning on resize
+              setTimeout(fixContentPosition, 100);
+          });
+
+          // Keyboard shortcuts - Logout available to all
+          document.addEventListener('keydown', (e) => {
+              // Escape key closes modals and dropdowns
+              if (e.key === 'Escape') {
+                  if (logoutModal) logoutModal.classList.remove('show');
+                  if (notificationDropdown) notificationDropdown.classList.remove('show');
+
+                  // Close sidebar on mobile
+                  if (window.innerWidth < 1200) {
+                      sidebar.classList.remove('show');
+                      sidebarOverlay.classList.remove('show');
+                  }
+              }
+
+              // Ctrl+L for logout - AVAILABLE TO ALL
+              if (e.ctrlKey && e.key === 'l') {
+                  e.preventDefault();
+                  if (logoutModal) logoutModal.classList.add('show');
+              }
+              
+              // Ctrl+N for notifications
+              if (e.ctrlKey && e.key === 'n') {
+                  e.preventDefault();
+                  if (notificationBtn) {
+                      notificationBtn.click();
+                  }
+              }
+          });
+
+          // Fix content positioning for all users
+          function fixContentPosition() {
+              const mainContent = document.querySelector('.main-content');
+              const header = document.querySelector('.app-header');
+              
+              if (mainContent && header) {
+                  // Get header height
+                  const headerHeight = header.offsetHeight;
+                  
+                  // Ensure main content is positioned correctly
+                  mainContent.style.top = `${headerHeight}px`;
+                  
+                  // Calculate available height
+                  const viewportHeight = window.innerHeight;
+                  const contentHeight = viewportHeight - headerHeight;
+                  
+                  // Set main content height
+                  mainContent.style.height = `${contentHeight}px`;
+                  mainContent.style.maxHeight = `${contentHeight}px`;
+                  mainContent.style.minHeight = `${contentHeight}px`;
+                  
+                  // Ensure content wrapper fills available space
+                  const contentWrapper = mainContent.querySelector('.content-wrapper');
+                  if (contentWrapper) {
+                      contentWrapper.style.minHeight = `${contentHeight - 48}px`; // Subtract padding
+                  }
+                  
+                  // Ensure content card fills available space if exists
+                  const contentCard = mainContent.querySelector('.content-card');
+                  if (contentCard) {
+                      contentCard.style.minHeight = `${contentHeight - 100}px`; // Adjust as needed
+                  }
+              }
+          }
+
+          // Initialize content positioning
+          fixContentPosition();
+          
+          // Also fix on page load
+          window.addEventListener('load', function() {
+              setTimeout(fixContentPosition, 300); // Wait for everything to load
+          });
+          
+          // Fix for dynamic content
+          const observer = new MutationObserver(function() {
+              setTimeout(fixContentPosition, 100);
+          });
+          
+          // Observe main content for changes
+          const mainContent = document.querySelector('.main-content');
+          if (mainContent) {
+              observer.observe(mainContent, {
+                  childList: true,
+                  subtree: true,
+                  characterData: true
+              });
+          }
+
+          // Role-based access control for URLs
+          function checkAccessControl() {
+              const userRole = "{{ user.groups.all.0.name }}";
+              const isSuperuser = {% if user.is_superuser %}true{% else %}false{% endif %};
+              const isStaff = {% if user.is_staff %}true{% else %}false{% endif %};
+              const isAccountant = userRole === 'Accountant';
+              
+              const currentUrl = window.location.pathname;
+              
+              // URLs that require Admin/Accountant access
+              const financeUrls = [
+                  '{% url "tithepayment:tithepayment_list" %}',
+                  '{% url "tithepayment:tithepayment_create" %}',
+                  '{% url "tithepayment:receipt_list" %}',
+                  '{% url "tithepayment:tithepayment_summary" %}'
+              ];
+              
+              // URLs that require Admin access only
+              const adminOnlyUrls = [
+                  '{% url "add_user" %}',
+                  '{% url "list_users" %}',
+                  '{% url "role_management" %}',
+              ];
+              
+              // Check if current URL is in finance URLs and user doesn't have access
+              const isFinanceUrl = financeUrls.some(url => currentUrl.includes(url.replace(/\/$/, '')));
+              if (isFinanceUrl && !isSuperuser && !isStaff && !isAccountant) {
+                  window.location.href = "{% url 'home' %}";
+                  return;
+              }
+              
+              // Check if current URL is in admin-only URLs and user is not superuser
+              const isAdminUrl = adminOnlyUrls.some(url => currentUrl.includes(url.replace(/\/$/, '')));
+              if (isAdminUrl && !isSuperuser) {
+                  window.location.href = "{% url 'home' %}";
+                  return;
+              }
+          }
+          
+          // Initialize access control check
+          checkAccessControl();
+
+          // Prevent access if not authenticated (additional security)
+          {% if not user.is_authenticated %}
+          document.body.innerHTML = `
+              <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: var(--background);">
+                  <div style="text-align: center;">
+                      <h1 style="color: var(--danger); margin-bottom: var(--space-md);">Access Denied</h1>
+                      <p style="margin-bottom: var(--space-lg);">Please login to access this page.</p>
+                      <a href="{% url '_login' %}" style="padding: var(--space-sm) var(--space-md); background: var(--primary); color: white; text-decoration: none; border-radius: var(--radius-md);">
+                          Go to Login
+                      </a>
+                  </div>
+              </div>
+          `;
+          {% endif %}
+          
+          // Force re-layout after everything is loaded
+          setTimeout(function() {
+              if (typeof ResizeObserver !== 'undefined') {
+                  const ro = new ResizeObserver(function() {
+                      fixContentPosition();
+                  });
+                  ro.observe(document.body);
+              }
+          }, 500);
+      });
+
+      // Function to fetch notifications
+      async function fetchNotifications() {
+          try {
+              const response = await fetch('/notifications/api/unread/');
+              if (response.ok) {
+                  const notifications = await response.json();
+                  updateNotificationList(notifications);
+                  
+                  // Update badge count
+                  const unreadCount = notifications.filter(n => !n.read).length;
+                  updateNotificationBadge(unreadCount);
+              } else {
+                  showNotificationError();
+              }
+          } catch (error) {
+              console.error('Error fetching notifications:', error);
+              showNotificationError();
+          }
+      }
+      
+      // Function to update notification list
+      function updateNotificationList(notifications) {
+          const notificationList = document.getElementById('notificationList');
+          if (!notificationList) return;
+          
+          if (!notifications || notifications.length === 0) {
+              notificationList.innerHTML = `
+                  <div class="notification-empty">
+                      <i class="far fa-bell-slash"></i>
+                      <p>No notifications yet</p>
+                  </div>
+              `;
+              return;
+          }
+          
+          let html = '';
+          notifications.forEach(notification => {
+              const timeAgo = getTimeAgo(notification.created_at || notification.timestamp);
+              const typeClass = getNotificationTypeClass(notification.type || notification.category);
+              
+              html += `
+                  <div class="notification-item ${notification.read ? '' : 'unread'}" 
+                       data-id="${notification.id || notification.notification_id}"
+                       onclick="markAsRead(${notification.id || notification.notification_id})">
+                      <div class="notification-item-header">
+                          <div class="notification-title-text">${notification.title || 'Notification'}</div>
+                          <div class="notification-time">${timeAgo}</div>
+                      </div>
+                      <div class="notification-message">${notification.message || notification.content || 'No message'}</div>
+                      <span class="notification-type ${typeClass}">
+                          ${notification.type || notification.category || 'Notification'}
+                      </span>
+                  </div>
+              `;
+          });
+          
+          notificationList.innerHTML = html;
+      }
+      
+      // Function to update notification badge
+      function updateNotificationBadge(count) {
+          const badge = document.querySelector('.notification-badge');
+          const unreadCountSpan = document.querySelector('.unread-count');
+          
+          if (badge) {
+              if (count > 0) {
+                  badge.textContent = count;
+                  badge.style.display = 'flex';
+              } else {
+                  badge.style.display = 'none';
+              }
+          }
+          
+          if (unreadCountSpan) {
+              if (count > 0) {
+                  unreadCountSpan.textContent = `${count} unread`;
+                  unreadCountSpan.style.display = 'inline-block';
+              } else {
+                  unreadCountSpan.textContent = '0 unread';
+                  unreadCountSpan.style.display = 'inline-block';
+              }
+          }
+      }
+      
+      // Function to show error state
+      function showNotificationError() {
+          const notificationList = document.getElementById('notificationList');
+          if (notificationList) {
+              notificationList.innerHTML = `
+                  <div class="notification-empty">
+                      <i class="fas fa-exclamation-triangle"></i>
+                      <p>Failed to load notifications</p>
+                  </div>
+              `;
+          }
+      }
+      
+      // Helper function to get time ago
+      function getTimeAgo(dateString) {
+          if (!dateString) return 'Recently';
+          
+          const date = new Date(dateString);
+          if (isNaN(date.getTime())) return 'Recently';
+          
+          const now = new Date();
+          const diffMs = now - date;
+          const diffMins = Math.floor(diffMs / (1000 * 60));
+          const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+          const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+          
+          if (diffMins < 1) return 'Just now';
+          if (diffMins < 60) return `${diffMins}m ago`;
+          if (diffHours < 24) return `${diffHours}h ago`;
+          if (diffDays < 7) return `${diffDays}d ago`;
+          return date.toLocaleDateString();
+      }
+      
+      // Helper function to get notification type class
+      function getNotificationTypeClass(type) {
+          if (!type) return 'notification-info';
+          
+          const typeMap = {
+              'success': 'notification-success',
+              'warning': 'notification-warning',
+              'info': 'notification-info',
+              'error': 'notification-danger',
+              'danger': 'notification-danger',
+              'alert': 'notification-warning',
+              'notice': 'notification-info'
+          };
+          return typeMap[type.toLowerCase()] || 'notification-info';
+      }
+
+      // Function to mark notification as read
+      async function markAsRead(notificationId) {
+          try {
+              const response = await fetch(`/notifications/mark-read/${notificationId}/`, {
+                  method: 'POST',
+                  headers: {
+                      'X-CSRFToken': getCookie('csrftoken'),
+                      'Content-Type': 'application/json',
+                  },
+              });
+              
+              if (response.ok) {
+                  // Update UI
+                  const notificationItem = document.querySelector(`[data-id="${notificationId}"]`);
+                  if (notificationItem) {
+                      notificationItem.classList.remove('unread');
+                      
+                      // Update count
+                      const currentCount = parseInt(document.querySelector('.notification-badge')?.textContent || '0');
+                      if (currentCount > 0) {
+                          updateNotificationBadge(currentCount - 1);
+                      }
+                      
+                      // Redirect if needed
+                      const data = await response.json();
+                      if (data.redirect_url) {
+                          window.location.href = data.redirect_url;
+                      }
+                  }
+              }
+          } catch (error) {
+              console.error('Error marking notification as read:', error);
+          }
+      }
+
+      // Helper function to get CSRF token
+      function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+              const cookies = document.cookie.split(';');
+              for (let i = 0; i < cookies.length; i++) {
+                  const cookie = cookies[i].trim();
+                  if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                      break;
+                  }
+              }
+          }
+          return cookieValue;
+      }
     </script>
 
     {% block script %}
     <!-- Additional scripts will be inserted here -->
     {% endblock script %}
-</body>
+  </body>
 </html>

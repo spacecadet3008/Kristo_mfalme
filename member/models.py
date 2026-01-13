@@ -29,7 +29,7 @@ class Ministry(models.Model):
         ('COORDINATOR','coordinator')
     ]
     name = models.CharField(max_length=255)
-    description = models.OneToOneField("Community", verbose_name="Community", on_delete=models.CASCADE, related_name="Community_member", null=True, blank=True)
+    description = models.ForeignKey("Community", verbose_name="Community", on_delete=models.CASCADE, related_name="Community_member", null=True, blank=True)
     feast_name = models.TextField(max_length='10',blank=True, null=True )
     feast_date = models.DateField(blank=True, null=True)
     #leader = models.OneToOneField("Member", on_delete=models.CASCADE,related_name='leader', blank=True, null=True)

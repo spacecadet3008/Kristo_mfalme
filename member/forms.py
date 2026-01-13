@@ -39,7 +39,7 @@ class MemberForm(forms.ModelForm):
 
 class MinistryForm(forms.ModelForm):
     class Meta:
-        fields = ['name', 'leader', 'description']
+        fields = ['name', 'leader', 'description','feast_date','feast_name']
         model = Ministry
 
 

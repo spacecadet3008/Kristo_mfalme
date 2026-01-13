@@ -37,7 +37,7 @@ def send_tithe_sms_notification(sender, instance, created, **kwargs):
         member_name = instance.name.name if hasattr(instance.name, 'name') else "Member"
         
         if created:
-            message = f"Habari {member_name}, zaka yako ya Tsh {instance.amount:,} imepokelewa. Asante!"
+            message = f"Kristo {member_name}, tunakushukuru kwa zaka yako ya {instance.amount} Tsh imepokelewa. malaki 3:10-11. Ubarikiwe"
         else:
             # Only send on update if specifically required to avoid spamming users
             message = f"Habari {member_name}, taarifa za zaka yako zimepata mabadiliko kuwa Tsh {instance.amount:,}. Asante!"

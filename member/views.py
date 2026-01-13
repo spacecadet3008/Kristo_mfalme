@@ -352,97 +352,79 @@ def delete_ministry(request, pk):
 
 @login_required
 def add_ministries(request):
-    # TODO: Make this functionality available only to admins
     template = "ministries/add.html"
     form = MinistryForm()
-    profile = UserProfile.objects.get_or_create(user=request.user)
+    # Fixed: get_or_create returns a tuple (object, created)
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
     context = {"form": form, "ministries_active_add": "active", "profile": profile}
     return render(request, template, context)
-
 
 @login_required
 def create_ministry(request):
     if request.method == 'POST':
-        ministry_name = request.POST.get('community_name')
+        # 1. Get the Community name from the form
+        community_name = request.POST.get('community_name')
         leader_names = request.POST.getlist('leaders_name[]')
         leader_positions = request.POST.getlist('leaders_position[]')
         leader_phones = request.POST.getlist('leaders_phone[]')
 
-        print(f"DEBUG: Processing {len(leader_names)} leaders for community: {ministry_name}")
-
-        if not ministry_name:
-            messages.error(request, "Ministry name is required")
-            return redirect('add_ministries')
+        if not community_name:
+            messages.error(request, "Community/Ministry name is required")
+            return redirect('add_ministry')
         
-        if not leader_names or not any(leader_names):
-            messages.error(request, "Please add at least one leader")
+        # 2. Link to the Community object
+        try:
+            # We use the community name to find/create the parent record
+            community_obj, created = Community.objects.get_or_create(name=community_name)
+        except Exception as e:
+            messages.error(request, f"Community Error: {str(e)}")
             return redirect('add_ministries')
         
         success_count = 0
         error_messages = []
 
-        try:
-        # Get or create the Community object
-            community, created = Community.objects.get_or_create(name=ministry_name)
-            if created:
-                print(f"DEBUG: Created new community: {ministry_name}")
-            else:
-                print(f"DEBUG: Using existing community: {ministry_name}")
-
-        except Exception as e:
-            messages.error(request, f"Error with community: {str(e)}")
-            return redirect('add_shepherd')
-        
-        # Process each leader
+        # 3. Iterate through submitted leaders
         for i in range(len(leader_names)):
-        # Skip empty entries
-            if not leader_names[i] or not leader_positions[i]:
+            name_val = leader_names[i].strip()
+            pos_val = leader_positions[i].strip()
+            phone_val = leader_phones[i] if i < len(leader_phones) else ''
+            
+            if not name_val or not pos_val:
                 continue
             
-            # Check if position already exists in this community
-            existing_leader = CommunityLeader.objects.filter(
-                community_name=community,  # Use the Community object, not string
-                leader=leader_positions[i]
-            ).first()
-            
-            if existing_leader:
-                error_messages.append(
-                    f"Position '{leader_positions[i]}' is already assigned to {existing_leader.name} in {community_name}"
-                )
+            # UNIQUE CHECK: Check if this specific position is already filled in THIS community
+            # We filter by 'description' because that is your link to the Community model
+            if Ministry.objects.filter(description=community_obj, position=pos_val).exists():
+                error_messages.append(f"The position '{pos_val}' is already taken in {community_name}")
                 continue
             
             try:
-                # Create the leader with Community object
-                leader = CommunityLeader(
-                    community_name=community,  # Pass the Community object
-                    name=leader_names[i],
-                    leader=leader_positions[i],
-                    phone=leader_phones[i] if i < len(leader_phones) else ''
+                # 4. Create the Ministry Record
+                # name: The name of the leader (based on your __str__ returning self.name)
+                # description: The link to the community
+                # leader: Storing leader name again or extra info
+                # position: The rank/choice
+                Ministry.objects.create(
+                    name=name_val,        # maps to models.CharField(max_length=255)
+                    leader=name_val,      # maps to models.CharField(max_length=250)
+                    position=pos_val,     # maps to models.CharField(choices=rank)
+                    phone=phone_val,      # maps to PhoneNumberField
+                    description=community_obj # maps to the ForeignKey/OneToOneField
                 )
-                
-                leader.save()
                 success_count += 1
-                print(f"DEBUG: Created leader {leader_names[i]} as {leader_positions[i]}")
-                
             except Exception as e:
-                error_msg = f"Error creating {leader_names[i]}: {str(e)}"
-                error_messages.append(error_msg)
-                print(f"DEBUG: Exception: {str(e)}")
+                error_messages.append(f"Could not add {name_val}: {str(e)}")
         
-        # Display results
+        # 5. Feedback and Redirect
         if success_count > 0:
-            messages.success(request, f"Successfully added {success_count} leader(s) to {community_name}")
+            messages.success(request, f"Successfully assigned {success_count} leader(s) to {community_name}")
         
         for error in error_messages:
             messages.error(request, error)
-        
-        if success_count == 0 and error_messages:
-            return redirect('add_ministry')
-        else:
-            return redirect('list_ministries')
-    
-    return redirect('add_ministry')
 
+        return redirect('list_ministries') if success_count > 0 else redirect('add_ministries')
+    
+    return redirect('add_ministries')
 
 
 @login_required

@@ -3,8 +3,9 @@ from django.urls import path
 from .views import (
     table_members, list_members, thumbnail_members, detail_member, edit_member, update_member, restore_member,
     delete_member, filter_members, search_members, get_members_by_statuses, get_members_by_shepherds, list_deleted_members,
-    list_ministries, add_ministries, create_ministry,
-    list_shepherds, add_shepherd, create_shepherd,edit_community,delete_community, delete_ministry,CreateMembersView,AddMemberView
+    list_ministries, add_ministries, create_ministry,edit_ministry,list_committees,create_committee,
+    list_shepherds, add_shepherd, create_shepherd,edit_community,delete_community, delete_ministry,
+    edit_committee,delete_committee_member,CreateMembersView,AddMemberView
 )
 
 urlpatterns = [
@@ -25,12 +26,19 @@ urlpatterns = [
     path('deleted/list/', list_deleted_members, name="list_deleted_members"),
     path('restore/<int:pk>/', restore_member, name="restore_members"),
 
+    #urlConf fot committee
+    path('committee/list/',list_committees,name="list_committees"),
+    path('committee/create/',create_committee, name='create_committee'),
+    path('committee/edit/<str:name>/',edit_committee, name='edit_committee'),
+    path('committee/delete/<str:name>',delete_committee_member, name="delete_committee_member"),
+
 
     # UrlConf For Ministries
     path('ministries/list/', list_ministries, name="list_ministries"),
     path('ministries/add/', add_ministries, name="add_ministry"),
     path('ministries/create/', create_ministry, name="create_ministry"),
-    path('ministries/delete/<int:pk>/', delete_ministry, name="delete_ministry"),
+    path('ministries/update/<str:m_name>/',edit_ministry, name='edit_ministry'),
+    path('ministries/delete/<str:pk>/', delete_ministry, name="delete_ministry"),
 
     # UrlConf For Communities
     path('shepherds/list/', list_shepherds, name="list_community"),

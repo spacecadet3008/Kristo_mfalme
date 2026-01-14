@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Member, Ministry, CommunityLeader
+from .models import Member, Ministry, CommunityLeader,Committee
 
 
 class MemberForm(forms.ModelForm):
@@ -39,8 +39,43 @@ class MemberForm(forms.ModelForm):
 
 class MinistryForm(forms.ModelForm):
     class Meta:
-        fields = ['name', 'leader', 'description','feast_date','feast_name']
         model = Ministry
+        fields = ['name', 'description', 'feast_name', 'feast_date', 'leader', 'position', 'phone']
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make description field optional since it's null=True, blank=True in model
+        self.fields['name'].required = False
+        self.fields['description'].required = False
+        self.fields['feast_name'].required = False
+        self.fields['feast_date'].required = False
+        self.fields['leader'].required = False
+        self.fields['position'].required = False
+        self.fields['phone'].required = False
+        
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if Ministry.objects.filter(name=name).exists():
+            if not self.instance or self.instance.name != name:
+                raise forms.ValidationError("A ministry with this name already exists.")
+        return name
+    
+class CommiteeForm(forms.ModelForm):
+    class Meta:
+        model = Committee
+        fields = ['Commitee_name', 'description', 'member', 'position', 'phone']
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Add classes so the JavaScript can find the fields
+        self.fields['member'].widget.attrs.update({
+            'class': 'member-input', 
+            'list': 'member-data',   # Connects to <datalist id="member-data">
+            'autocomplete': 'off'
+        })
+        self.fields['phone'].widget.attrs.update({
+            'class': 'phone-input'
+        })
 
 
 class ShepherdForm(forms.ModelForm):

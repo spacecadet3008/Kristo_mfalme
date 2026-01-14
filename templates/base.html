@@ -362,6 +362,61 @@
         font-weight: 500;
       }
 
+    .nested-submenu {
+          overflow: hidden;
+          max-height: 0;
+          transition: max-height var(--transition-base) ease;
+          background: rgba(0, 0, 0, 0.15);
+          border-radius: var(--radius-md);
+          margin: var(--space-xs) var(--space-sm) var(--space-sm) calc(var(--space-lg) + 24px + 20px);
+          padding-left: var(--space-xs);
+      }
+
+      .nested-submenu.open {
+          max-height: 500px;
+      }
+
+      .nested-submenu-link {
+          display: flex;
+          align-items: center;
+          gap: var(--space-md);
+          padding: var(--space-xs) var(--space-lg);
+          color: rgba(255, 255, 255, 0.8);
+          text-decoration: none;
+          border-radius: var(--radius-sm);
+          transition: all var(--transition-fast);
+          position: relative;
+          font-weight: 500;
+          font-size: 0.875rem;
+      }
+
+      .nested-submenu-link:hover {
+          background: rgba(255, 255, 255, 0.1);
+          color: white;
+      }
+
+      .nested-submenu-link.active {
+          background: rgba(255, 255, 255, 0.15);
+          color: white;
+          font-weight: 600;
+      }
+
+    /* When sidebar is collapsed, hide submenus */
+    .sidebar.collapsed .nested-submenu {
+        display: none;
+    }
+
+    /* Dropdown toggle with chevron */
+    .dropdown-toggle .nav-chevron {
+        margin-left: auto;
+        font-size: 0.75rem;
+        transition: transform var(--transition-base);
+    }
+
+    .dropdown-toggle.active .nav-chevron {
+        transform: rotate(90deg);
+    }
+
       /* Sidebar Footer */
       .sidebar-footer {
         padding: var(--space-md) var(--space-lg);
@@ -1647,6 +1702,33 @@
                 </div>
               </div>
 
+              <!-- Committee Dropdown -->
+            <div class="nav-item dropdown-menu">
+              <div class="nav-link nav-toggle {% if committee_active_add or committee_active_list %}active{% endif %}" data-target="committee-submenu">
+                <div class="nav-icon">
+                  <i class="fas fa-users-cog"></i>
+                </div>
+                <div class="nav-text">Committees</div>
+                <div class="nav-chevron">
+                  <i class="fas fa-chevron-down"></i>
+                </div>
+              </div>
+              <div class="submenu" id="committee-submenu" {% if committee_active_add or committee_active_list %}style="max-height: 500px;" {% endif %}>
+                <a href="{% url 'create_committee' %}" class="submenu-link {% if committee_active_add %}active{% endif %}">
+                  <div class="submenu-icon">
+                    <i class="fas fa-user-plus"></i>
+                  </div>
+                  <div class="submenu-text">Add Committee</div>
+                </a>
+                <a href="{% url 'list_committees' %}" class="submenu-link {% if committee_active_list %}active{% endif %}">
+                  <div class="submenu-icon">
+                    <i class="fas fa-table"></i>
+                  </div>
+                  <div class="submenu-text">List Committees</div>
+                </a>
+              </div>
+            </div>
+
               <!-- Communities Dropdown -->
               <div class="nav-item dropdown-menu">
                 <div class="nav-link nav-toggle {% if shepherds_active_add or shepherds_active_list %}active{% endif %}" data-target="communities-submenu">
@@ -1740,6 +1822,16 @@
                   </a>
                 </div>
               </div>
+
+            <div class="nav-item">
+                <a href="{% url 'financial_dashboard' %}" class="nav-link {% if finance_active_page %}active{% endif %}">
+                    <div class="nav-icon">
+                        <i class="fas fa-money-check-alt"></i>
+                    </div>
+                    <div class="nav-text">Financial Tracker</div>
+                </a>
+            </div>
+
               {% endif %}
 
               <!-- Administration Section - Only for Admin -->
@@ -1908,17 +2000,17 @@
                 <div class="notification-title">
                   <h3>Notifications</h3>
                   <span class="unread-count">{{ unread_count }} unread</span>
-                  {% if user.is_superuser or user.is_staff or user.groups.all.0.name == 'Admin' %}
+                  {% if user.is_superuser or user.is_staff or user.roles == 'Admin' %}
                 </div>
-                <a href="{% url 'notification-dashboard' %}" class="mark-all-read">Dashboard</a>
+                <a href="{% url "notification_list" %}" class="mark-all-read">Dashboard</a>
               </div>
               {% endif %}
               <div>
-                <a href="{% url 'mark-all-read' %}" class="mark-all-read" style="float: right; margin-right: 16px; margin-top: -28px;">Mark all read</a>
+                <a href="" class="mark-all-read" style="float: right; margin-right: 16px; margin-top: -28px;">Mark all read</a>
               </div>
               
               <!-- Notifications List -->
-              <div class="notification-list" id="notificationList">
+              <div class="list" id="notificationList">
                 <!-- Will be populated by JavaScript -->
                 <div class="notification-loading">
                   <i class="fas fa-spinner fa-spin"></i>
@@ -1928,7 +2020,7 @@
               
               <!-- Footer -->
               <div class="notification-footer">
-                <a href="{% url 'notification-list' %}">View all notifications</a>
+                <a href="{% url 'notification_list' %}">View all notifications</a>
               </div>
             </div>
           </div>
@@ -2149,10 +2241,47 @@
               });
           });
 
+          // Handle nested dropdown menus
+          const nestedToggles = document.querySelectorAll('.dropdown-toggle');
+          nestedToggles.forEach(toggle => {
+              toggle.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+
+                  const targetId = this.getAttribute('data-target');
+                  const submenu = document.getElementById(targetId);
+
+                  if (submenu) {
+                      const isOpen = submenu.style.maxHeight && submenu.style.maxHeight !== '0px';
+
+                      // Close all other nested submenus in the same level
+                      const parentSubmenu = this.closest('.submenu, .nested-submenu');
+                      if (parentSubmenu) {
+                          parentSubmenu.querySelectorAll('.nested-submenu').forEach(menu => {
+                              if (menu.id !== targetId) {
+                                  menu.style.maxHeight = '0px';
+                                  const otherToggle = menu.parentElement.querySelector('.dropdown-toggle');
+                                  if (otherToggle) otherToggle.classList.remove('active');
+                              }
+                          });
+                      }
+
+                      // Toggle current nested submenu
+                      if (isOpen) {
+                          submenu.style.maxHeight = '0px';
+                          this.classList.remove('active');
+                      } else {
+                          submenu.style.maxHeight = submenu.scrollHeight + 'px';
+                          this.classList.add('active');
+                      }
+                  }
+              });
+          });
+
           // Set active menu based on current URL
           function setActiveMenu() {
               const currentUrl = window.location.pathname;
-              const navLinks = document.querySelectorAll('.nav-link, .submenu-link');
+              const navLinks = document.querySelectorAll('.nav-link, .submenu-link, .nested-submenu-link');
 
               // Remove all active classes
               navLinks.forEach(link => link.classList.remove('active'));
@@ -2163,7 +2292,18 @@
                   if (href && currentUrl.startsWith(href)) {
                       link.classList.add('active');
 
-                      // Open parent submenu if exists
+                      // Open parent submenus
+                      let parentSubmenu = link.closest('.nested-submenu');
+                      while (parentSubmenu) {
+                          parentSubmenu.style.maxHeight = parentSubmenu.scrollHeight + 'px';
+                          const toggle = parentSubmenu.parentElement.querySelector('.dropdown-toggle');
+                          if (toggle) toggle.classList.add('active');
+                          
+                          // Go up one level
+                          parentSubmenu = parentSubmenu.parentElement.closest('.nested-submenu');
+                      }
+
+                      // Open main submenu
                       const submenu = link.closest('.submenu');
                       if (submenu) {
                           submenu.style.maxHeight = submenu.scrollHeight + 'px';

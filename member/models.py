@@ -34,11 +34,11 @@ class Ministry(models.Model):
     feast_date = models.DateField(blank=True, null=True)
     #leader = models.OneToOneField("Member", on_delete=models.CASCADE,related_name='leader', blank=True, null=True)
     leader = models.CharField(max_length=250, null=True, blank=True)
-    position = models.CharField(max_length=30,choices=rank,null=True, blank=True)
+    position = models.CharField(max_length=30,choices=rank,null=True, blank=True, default='Member')
     phone = PhoneNumberField(max_length=255, null=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name}"
 
 class Community(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -66,11 +66,34 @@ class CommunityLeader(models.Model):
     feast_date = models.DateField(blank=True, null=True)
     phone = PhoneNumberField(max_length=255,blank=True, null=True)
     
-    class Meta:
-        unique_together = ['community_name', 'leader']  # Prevent duplicate positions in same community
-    
     def __str__(self):
-        return f"{self.name} - {self.leader} {self.feast_date} {self.feast_name} ({self.community_name.name})"
+        return f"{self.leader} {self.feast_date} {self.feast_name} ({self.community_name.name})"
+    
+class Committee(models.Model):
+    Position = [
+        ('VICE CHAIR', 'Vice Chair'),
+        ('SECRETARY', 'Secretary'),
+        ('VICE SECRETARY', 'Vice Secretary'),
+        ('ACCOUNTANT', 'Accountant'),
+        ('CHAIRPERSON', 'Chairperson'),
+        ('MEMBER','Member')
+    ]
+
+    Commitee_name = models.CharField(max_length=250, blank=False, null=True)
+    position = models.CharField(max_length=50, choices=Position, null=True, blank=True)
+    member = models.ForeignKey("Member", verbose_name="commitee_names", on_delete=models.CASCADE)
+    description = models.CharField (max_length=50, help_text ='Write the Functions of your commitee ', blank=True, null=True)
+    phone = PhoneNumberField(max_length=255, null=True, blank=True, help_text=' Eg. +255 ')
+
+    def __str__(self):
+        return f'{self.Commitee_name}'
+    
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if Ministry.objects.filter(name=name).exists():
+            if not self.instance or self.instance.name != name:
+                raise ("A ministry with this name already exists.")
+        return name
 
 
 class MemberManager(models.Manager):
@@ -126,7 +149,7 @@ class Member(models.Model):
     objects = MemberManager()
 
     def __str__(self):
-        return f'{self.name} {self.telephone}'
+        return f'{self.name}'
     
     @property
     def picture_url(self):

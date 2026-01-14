@@ -8,7 +8,7 @@ from django.forms import formset_factory
 
 from .models import Community, Member, Ministry, CommunityLeader
 from users.models import UserProfile
-from .forms import MemberForm, MinistryForm, ShepherdForm
+from .forms import MemberForm, MinistryForm, ShepherdForm,Committee
 from django.contrib import messages
 
 @login_required
@@ -334,13 +334,167 @@ class MemberListView(ListView):
     context_object_name = 'members'
     paginate_by = 20
 
+#Committees Views
+
+def list_committees(request):
+    committees = Committee.objects.all().order_by('Commitee_name')
+    return render(request, 'committees/list.html', {
+        'committees': committees,
+        'committee_active_list': True
+    })
+
+def create_committee(request):
+    if request.method == 'POST':
+        comm_name = request.POST.get('Commitee_name')
+        desc = request.POST.get('description')
+        
+        # Get dynamic lists
+        member_names = request.POST.getlist('members[]')
+        positions = request.POST.getlist('positions[]')
+        phones = request.POST.getlist('phones[]')
+
+        for m_name, pos, ph in zip(member_names, positions, phones):
+            if m_name and pos:
+                try:
+                    # Look up member by name (since Datalist sends text)
+                    member_obj = Member.objects.get(name=m_name)
+                    
+                    # Unique Position Check
+                    if Committee.objects.filter(Commitee_name=comm_name, position=pos).exists():
+                        messages.error(request, f"The position {pos} is already taken.")
+                        continue
+
+                    Committee.objects.create(
+                        Commitee_name=comm_name,
+                        description=desc,
+                        member=member_obj,
+                        position=pos,
+                        phone=ph
+                    )
+                except Member.DoesNotExist:
+                    messages.error(request, f"Member '{m_name}' not found.")
+
+        messages.success(request, "Committee created successfully!")
+        return redirect('list_committees')
+
+    # Pass data to template
+    context = {
+        'members': Member.objects.all(),
+        'positions': Committee.Position,
+        'committee_active_add': True
+    }
+    return render(request, 'committees/create.html', context)
+
+
+    members = Member.objects.all()
+    positions = Committee.Position
+    return render(request, 'committees/create.html', {'members': members, 'positions': positions})
+
+def edit_committee(request, name):
+    # Get all records sharing the same committee name
+    committee_members = Committee.objects.filter(Commitee_name=name)
+    if request.method == 'POST':
+        committee_members.delete() # Simple update strategy: replace records
+        # Re-use the creation logic here...
+        return redirect('list_committees')
+        
+    context = {
+        'name': name,
+        'committee_members': committee_members,
+        'members': Member.objects.all(),
+        'positions': Committee.Position,
+        'desc': committee_members.first().description if committee_members.exists() else ""
+    }
+    return render(request, 'committees/edit.html', context)
+
+def delete_committee_member(request, pk):
+    member = get_object_or_404(Committee, pk=pk)
+    name = member.Commitee_name
+    member.delete()
+    messages.success(request, "Member removed from committee.")
+    return redirect('list_committees')
+
+"""
+ministries views 
+"""
+
+
+@login_required
+def edit_ministry(request, m_name):
+    # 1. Fetch all leaders that share this Ministry Name
+    # We use .filter() because your model creates a new row for each leader
+    ministry_leaders = Ministry.objects.filter(name=m_name)
+    
+    if not ministry_leaders.exists():
+        messages.error(request, f"Ministry '{m_name}' not found.")
+        return redirect('list_ministries')
+
+    if request.method == 'POST':
+        # Get the updated Ministry Name from the top field
+        new_m_name = request.POST.get('ministry_name', '').strip()
+        
+        # Get dynamic lists for leaders
+        leader_names = request.POST.getlist('leaders_name[]')
+        community_ids = request.POST.getlist('leaders_community[]')
+        leader_positions = request.POST.getlist('leaders_position[]')
+        leader_phones = request.POST.getlist('leaders_phone[]')
+        
+        # We delete old records and recreate them to handle additions/removals easily
+        # Alternatively, you could update existing IDs if you track them in hidden inputs
+        ministry_leaders.delete()
+
+        success_count = 0
+        for l_name, comm_id, pos, phone in zip(leader_names, community_ids, leader_positions, leader_phones):
+            if l_name.strip() and pos.strip() and comm_id:
+                try:
+                    community_obj = Community.objects.get(pk=comm_id)
+                    
+                    # Create updated record
+                    Ministry.objects.create(
+                        name=new_m_name,
+                        leader=l_name.strip(),
+                        position=pos.strip(),
+                        phone=phone.strip() if phone else None,
+                        description=community_obj,
+                    )
+                    success_count += 1
+                except Exception as e:
+                    messages.error(request, f"Error updating {l_name}: {str(e)}")
+
+        messages.success(request, f"Successfully updated {new_m_name} ministry.")
+        return redirect('list_ministries')
+
+    # GET Request: Load existing data
+    communities = Community.objects.all()
+    # Use the first leader record to get shared info like feast_name if applicable
+    first_record = ministry_leaders.first() 
+    
+    context = {
+        'ministry_name': m_name,
+        'leaders': ministry_leaders,
+        'communities': communities,
+        'first_record': first_record,
+    }
+    return render(request, 'ministries/edit.html', context)
+
 @login_required
 def list_ministries(request):
-    template = "ministries/list.html"
-    ministries = Ministry.objects.all()
+    # Group ministries by name
+    from django.db.models import Q
+    
+    ministries = Ministry.objects.all().select_related('description').order_by('name', 'position')
     profile = UserProfile.objects.get_or_create(user=request.user)
-    context = {"ministries": ministries, "ministries_active_list": "active", "profile": profile}
-    return render(request, template, context)
+    # Group by ministry name
+    ministry_groups = {}
+    for ministry in ministries:
+        if ministry.name not in ministry_groups:
+            ministry_groups[ministry.name] = []
+        ministry_groups[ministry.name].append(ministry)
+    
+    context = {
+        'ministry_groups': ministry_groups,"ministries_active_list": "active",
+    }
+    return render(request, 'ministries/list.html', context)
 
 def delete_ministry(request, pk):
     if request.method == "POST":
@@ -353,78 +507,91 @@ def delete_ministry(request, pk):
 @login_required
 def add_ministries(request):
     template = "ministries/add.html"
-    form = MinistryForm()
-    # Fixed: get_or_create returns a tuple (object, created)
     profile, created = UserProfile.objects.get_or_create(user=request.user)
-    context = {"form": form, "ministries_active_add": "active", "profile": profile}
+    communities = Community.objects.all()
+    position_choices = Ministry.rank  # Get choices from model
+    
+    context = {
+        "ministries_active_add": "active", 
+        "profile": profile, 
+        'communities': communities,
+        'position_choices': position_choices
+    }
     return render(request, template, context)
 
-@login_required
 def create_ministry(request):
     if request.method == 'POST':
-        # 1. Get the Community name from the form
-        community_name = request.POST.get('community_name')
+        # 1. Capture the "Ministry Name" once (from the top of your form)
+        ministry_name_val = request.POST.get('ministry_name', '').strip()
+
+        # 2. Capture lists for leaders (from the dynamic rows)
         leader_names = request.POST.getlist('leaders_name[]')
+        community_ids = request.POST.getlist('leaders_community[]')
         leader_positions = request.POST.getlist('leaders_position[]')
         leader_phones = request.POST.getlist('leaders_phone[]')
 
-        if not community_name:
-            messages.error(request, "Community/Ministry name is required")
+        # Validation
+        if not ministry_name_val:
+            messages.error(request, 'Ministry Name is required.')
             return redirect('add_ministry')
-        
-        # 2. Link to the Community object
-        try:
-            # We use the community name to find/create the parent record
-            community_obj, created = Community.objects.get_or_create(name=community_name)
-        except Exception as e:
-            messages.error(request, f"Community Error: {str(e)}")
-            return redirect('add_ministries')
-        
+
         success_count = 0
         error_messages = []
 
-        # 3. Iterate through submitted leaders
-        for i in range(len(leader_names)):
-            name_val = leader_names[i].strip()
-            pos_val = leader_positions[i].strip()
-            phone_val = leader_phones[i] if i < len(leader_phones) else ''
-            
-            if not name_val or not pos_val:
+        # 3. Use zip to pair leader data correctly
+        for l_name, comm_id_str, pos, phone in zip(leader_names, community_ids, leader_positions, leader_phones):
+            l_name = l_name.strip()
+            pos = pos.strip()
+
+            # Skip empty rows
+            if not l_name or not pos or not comm_id_str:
                 continue
-            
-            # UNIQUE CHECK: Check if this specific position is already filled in THIS community
-            # We filter by 'description' because that is your link to the Community model
-            if Ministry.objects.filter(description=community_obj, position=pos_val).exists():
-                error_messages.append(f"The position '{pos_val}' is already taken in {community_name}")
-                continue
-            
+
             try:
-                # 4. Create the Ministry Record
-                # name: The name of the leader (based on your __str__ returning self.name)
-                # description: The link to the community
-                # leader: Storing leader name again or extra info
-                # position: The rank/choice
+                # Clean the community ID (remove any commas or spaces)
+                comm_id_str = comm_id_str.strip().split(',')[0]  # Take first value if comma-separated
+                
+                try:
+                    comm_id = int(comm_id_str)
+                except ValueError:
+                    error_messages.append(f"Invalid community ID for {l_name}: '{comm_id_str}' is not a valid number.")
+                    continue
+                
+                # Get the community object
+                community_obj = Community.objects.get(pk=comm_id)
+
+                # 4. UNIQUE CHECK: Position + Community (check both together)
+                if Ministry.objects.filter(position=pos, description=community_obj).exists():
+                    error_messages.append(f"Position '{pos}' already exists in {community_obj.name}")
+                    continue
+
+                # 5. SAVE: Create the ministry entry
                 Ministry.objects.create(
-                    name=name_val,        # maps to models.CharField(max_length=255)
-                    leader=name_val,      # maps to models.CharField(max_length=250)
-                    position=pos_val,     # maps to models.CharField(choices=rank)
-                    phone=phone_val,      # maps to PhoneNumberField
-                    description=community_obj # maps to the ForeignKey/OneToOneField
+                    name=ministry_name_val,     # Ministry Name (e.g., "Choir")
+                    leader=l_name,              # Leader's Name (e.g., "Jane Doe")
+                    position=pos,               # Position (e.g., "Coordinator")
+                    phone=phone.strip() if phone else '',
+                    description=community_obj,  # Community object
                 )
                 success_count += 1
-            except Exception as e:
-                error_messages.append(f"Could not add {name_val}: {str(e)}")
-        
-        # 5. Feedback and Redirect
-        if success_count > 0:
-            messages.success(request, f"Successfully assigned {success_count} leader(s) to {community_name}")
-        
-        for error in error_messages:
-            messages.error(request, error)
 
-        return redirect('list_ministries') if success_count > 0 else redirect('add_ministries')
-    
-    return redirect('add_ministries')
+            except Community.DoesNotExist:
+                error_messages.append(f"Error adding {l_name}: Community with ID {comm_id} does not exist.")
+            except Exception as e:
+                error_messages.append(f"Error adding {l_name}: {str(e)}")
+
+        # Show appropriate messages
+        if success_count > 0:
+            messages.success(request, f"Successfully added {success_count} leader(s) to {ministry_name_val}")
+        
+        for err in error_messages:
+            messages.error(request, err)
+
+        return redirect('list_ministries') if success_count > 0 else redirect('add_ministry')
+
+    # GET request
+    communities = Community.objects.all()
+    return render(request, 'add_ministry.html', {'communities': communities})
 
 
 @login_required

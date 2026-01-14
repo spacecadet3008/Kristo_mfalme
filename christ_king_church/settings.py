@@ -12,11 +12,14 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv,find_dotenv
+import africastalking
 import dj_database_url
 from django.contrib import messages
 
-load_dotenv()  
+load_dotenv(find_dotenv())  
+print(f"DEBUG: Username is |{os.getenv('AFRICASTALKING_USERNAME')}|")
+print(f"DEBUG: API Key is |{os.getenv('AFRICASTALKING_API_KEY')}|")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -55,8 +58,9 @@ INSTALLED_APPS = [
     'users',
     'phonenumber_field',
     'tithe',
-    'notification',
+    'notifications',
     'rest_framework',
+    'finance'
 ]
 
 LOGIN_URL = 'login_user'  
@@ -183,21 +187,24 @@ MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn", "media_root")
 
 """STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'"""
 
-# SMS Configuration
 # Africa's Talking Configuration (for testing)
-AFRICASTALKING_API_KEY = os.getenv('AFRICASTALKING_API_KEY')
-AFRICASTALKING_USERNAME = os.getenv('AFRICASTALKING_USERNAME')
+SEND_SMS_ENABLED = True 
+username = os.getenv('AFRICASTALKING_USERNAME')  
+api_key = os.getenv('AFRICASTALKING_API_KEY')
 
-# Or NextSMS Configuration
+africastalking.initialize(username, api_key)
+sms = africastalking.SMS
+
+"""# Or NextSMS Configuration
 NEXTSMS_API_KEY = 'your_nextsms_api_key'
 NEXTSMS_API_SECRET = 'your_nextsms_api_secret'
-NEXTSMS_SENDER_ID = 'your_sender_id'
+NEXTSMS_SENDER_ID = 'your_sender_id'"""
 
-#Beem africa configuration
+"""#Beem africa configuration
 BEEM_API_KEY = os.getenv('BEEM_API_KEY')
 BEEM_SECRET_KEY = os.getenv('BEEM_SECRET_KEY')
 BEEM_SENDER_NAME = os.getenv('BEEM_SENDER_NAME')    
-
-# Choose which provider to use
-SMS_PROVIDER = 'beem_africa'  # Change to 'nextsms' when ready
-SEND_SMS_ENABLED = True
+"""
+"""# Choose which provider to use
+SMS_PROVIDER = 'africastalking'  # Change to 'nextsms' when ready
+SEND_SMS_ENABLED = True"""

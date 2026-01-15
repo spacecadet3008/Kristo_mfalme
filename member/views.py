@@ -4,11 +4,12 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
+from django.db import transaction
 from django.forms import formset_factory
 
 from .models import Community, Member, Ministry, CommunityLeader
 from users.models import UserProfile
-from .forms import MemberForm, MinistryForm, ShepherdForm,Committee
+from .forms import MemberForm, MinistryForm, MinistryLeaderFormSet, ShepherdForm,Committee
 from django.contrib import messages
 
 @login_required
@@ -418,181 +419,140 @@ def delete_committee_member(request, pk):
 ministries views 
 """
 
-
 @login_required
-def edit_ministry(request, m_name):
-    # 1. Fetch all leaders that share this Ministry Name
-    # We use .filter() because your model creates a new row for each leader
-    ministry_leaders = Ministry.objects.filter(name=m_name)
-    
-    if not ministry_leaders.exists():
-        messages.error(request, f"Ministry '{m_name}' not found.")
-        return redirect('list_ministries')
-
-    if request.method == 'POST':
-        # Get the updated Ministry Name from the top field
-        new_m_name = request.POST.get('ministry_name', '').strip()
-        
-        # Get dynamic lists for leaders
-        leader_names = request.POST.getlist('leaders_name[]')
-        community_ids = request.POST.getlist('leaders_community[]')
-        leader_positions = request.POST.getlist('leaders_position[]')
-        leader_phones = request.POST.getlist('leaders_phone[]')
-        
-        # We delete old records and recreate them to handle additions/removals easily
-        # Alternatively, you could update existing IDs if you track them in hidden inputs
-        ministry_leaders.delete()
-
-        success_count = 0
-        for l_name, comm_id, pos, phone in zip(leader_names, community_ids, leader_positions, leader_phones):
-            if l_name.strip() and pos.strip() and comm_id:
-                try:
-                    community_obj = Community.objects.get(pk=comm_id)
-                    
-                    # Create updated record
-                    Ministry.objects.create(
-                        name=new_m_name,
-                        leader=l_name.strip(),
-                        position=pos.strip(),
-                        phone=phone.strip() if phone else None,
-                        description=community_obj,
-                    )
-                    success_count += 1
-                except Exception as e:
-                    messages.error(request, f"Error updating {l_name}: {str(e)}")
-
-        messages.success(request, f"Successfully updated {new_m_name} ministry.")
-        return redirect('list_ministries')
-
-    # GET Request: Load existing data
-    communities = Community.objects.all()
-    # Use the first leader record to get shared info like feast_name if applicable
-    first_record = ministry_leaders.first() 
-    
-    context = {
-        'ministry_name': m_name,
-        'leaders': ministry_leaders,
-        'communities': communities,
-        'first_record': first_record,
-    }
-    return render(request, 'ministries/edit.html', context)
-
-@login_required
-def list_ministries(request):
-    # Group ministries by name
-    from django.db.models import Q
-    
-    ministries = Ministry.objects.all().select_related('description').order_by('name', 'position')
-    profile = UserProfile.objects.get_or_create(user=request.user)
-    # Group by ministry name
-    ministry_groups = {}
-    for ministry in ministries:
-        if ministry.name not in ministry_groups:
-            ministry_groups[ministry.name] = []
-        ministry_groups[ministry.name].append(ministry)
-    
-    context = {
-        'ministry_groups': ministry_groups,"ministries_active_list": "active",
-    }
-    return render(request, 'ministries/list.html', context)
-
-def delete_ministry(request, pk):
-    if request.method == "POST":
-        ministry = get_object_or_404(Ministry,pk=pk)
-        ministry.delete()
-        messages.success(request, "Ministry Deleted Succesfully")
-        return redirect('list_ministries')
-
-
-@login_required
-def add_ministries(request):
-    template = "ministries/add.html"
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
-    communities = Community.objects.all()
-    position_choices = Ministry.rank  # Get choices from model
-    
-    context = {
-        "ministries_active_add": "active", 
-        "profile": profile, 
-        'communities': communities,
-        'position_choices': position_choices
-    }
-    return render(request, template, context)
-
 def create_ministry(request):
     if request.method == 'POST':
-        # 1. Capture the "Ministry Name" once (from the top of your form)
-        ministry_name_val = request.POST.get('ministry_name', '').strip()
-
-        # 2. Capture lists for leaders (from the dynamic rows)
-        leader_names = request.POST.getlist('leaders_name[]')
-        community_ids = request.POST.getlist('leaders_community[]')
-        leader_positions = request.POST.getlist('leaders_position[]')
-        leader_phones = request.POST.getlist('leaders_phone[]')
-
-        # Validation
-        if not ministry_name_val:
-            messages.error(request, 'Ministry Name is required.')
-            return redirect('add_ministry')
-
-        success_count = 0
-        error_messages = []
-
-        # 3. Use zip to pair leader data correctly
-        for l_name, comm_id_str, pos, phone in zip(leader_names, community_ids, leader_positions, leader_phones):
-            l_name = l_name.strip()
-            pos = pos.strip()
-
-            # Skip empty rows
-            if not l_name or not pos or not comm_id_str:
-                continue
-
-            try:
-                # Clean the community ID (remove any commas or spaces)
-                comm_id_str = comm_id_str.strip().split(',')[0]  # Take first value if comma-separated
-                
-                try:
-                    comm_id = int(comm_id_str)
-                except ValueError:
-                    error_messages.append(f"Invalid community ID for {l_name}: '{comm_id_str}' is not a valid number.")
-                    continue
-                
-                # Get the community object
-                community_obj = Community.objects.get(pk=comm_id)
-
-                # 4. UNIQUE CHECK: Position + Community (check both together)
-                if Ministry.objects.filter(position=pos, description=community_obj).exists():
-                    error_messages.append(f"Position '{pos}' already exists in {community_obj.name}")
-                    continue
-
-                # 5. SAVE: Create the ministry entry
-                Ministry.objects.create(
-                    name=ministry_name_val,     # Ministry Name (e.g., "Choir")
-                    leader=l_name,              # Leader's Name (e.g., "Jane Doe")
-                    position=pos,               # Position (e.g., "Coordinator")
-                    phone=phone.strip() if phone else '',
-                    description=community_obj,  # Community object
-                )
-                success_count += 1
-
-            except Community.DoesNotExist:
-                error_messages.append(f"Error adding {l_name}: Community with ID {comm_id} does not exist.")
-            except Exception as e:
-                error_messages.append(f"Error adding {l_name}: {str(e)}")
-
-        # Show appropriate messages
-        if success_count > 0:
-            messages.success(request, f"Successfully added {success_count} leader(s) to {ministry_name_val}")
+        ministry_form = MinistryForm(request.POST)
+        leader_formset = MinistryLeaderFormSet(request.POST)
         
-        for err in error_messages:
-            messages.error(request, err)
+        if ministry_form.is_valid() and leader_formset.is_valid():
+            try:
+                with transaction.atomic():
+                    ministry = ministry_form.save()
+                    leader_formset.instance = ministry
+                    leader_formset.save()
+                    
+                messages.success(request, f'Ministry "{ministry.name}" has been created successfully!')
+                return redirect('ministry_detail', pk=ministry.pk)
+            except Exception as e:
+                messages.error(request, f'Error creating ministry: {str(e)}')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        ministry_form = MinistryForm()
+        leader_formset = MinistryLeaderFormSet()
+    
+    context = {
+        'ministry_form': ministry_form,
+        'leader_formset': leader_formset,
+        'title': 'Create Ministry'
+    }
+    return render(request, 'ministries/ministry_form.html', context)
 
-        return redirect('list_ministries') if success_count > 0 else redirect('add_ministry')
 
-    # GET request
-    communities = Community.objects.all()
-    return render(request, 'add_ministry.html', {'communities': communities})
+@login_required
+def update_ministry(request, pk):
+    ministry = get_object_or_404(Ministry, pk=pk)
+    
+    if request.method == 'POST':
+        ministry_form = MinistryForm(request.POST, instance=ministry)
+        leader_formset = MinistryLeaderFormSet(request.POST, instance=ministry)
+        
+        if ministry_form.is_valid() and leader_formset.is_valid():
+            try:
+                with transaction.atomic():
+                    # Save ministry
+                    ministry = ministry_form.save()
+                    
+                    # Save leaders
+                    leaders = leader_formset.save(commit=False)
+                    
+                    # Save new and updated leaders
+                    for leader in leaders:
+                        leader.ministry = ministry
+                        leader.save()
+                    
+                    # Delete leaders marked for deletion
+                    for leader in leader_formset.deleted_objects:
+                        leader.delete()
+                    
+                    messages.success(
+                        request, 
+                        f'Ministry "{ministry.name}" has been updated successfully!'
+                    )
+                    return redirect('ministry_detail', pk=ministry.pk)
+                    
+            except Exception as e:
+                messages.error(request, f'Error updating ministry: {str(e)}')
+        else:
+            # Display specific form errors
+            if ministry_form.errors:
+                for field, errors in ministry_form.errors.items():
+                    for error in errors:
+                        messages.error(request, f'{field}: {error}')
+            
+            if leader_formset.errors:
+                for i, form_errors in enumerate(leader_formset.errors):
+                    if form_errors:
+                        for field, errors in form_errors.items():
+                            for error in errors:
+                                messages.error(request, f'Leader {i+1} - {field}: {error}')
+            
+            if leader_formset.non_form_errors():
+                for error in leader_formset.non_form_errors():
+                    messages.error(request, error)
+    else:
+        ministry_form = MinistryForm(instance=ministry)
+        leader_formset = MinistryLeaderFormSet(instance=ministry)
+    
+    context = {
+        'ministry_form': ministry_form,
+        'leader_formset': leader_formset,
+        'ministry': ministry,
+        'title': f'Update {ministry.name}',
+        'is_update': True
+    }
+    return render(request, 'ministries/ministry_form.html', context)
 
+
+@login_required
+def ministry_list(request):
+    ministries = Ministry.objects.all().prefetch_related('leaders', 'leaders__community')
+    context = {
+        'ministries': ministries,
+        'title': 'Ministries'
+    }
+    return render(request, 'ministries/ministry_list.html', context)
+
+
+@login_required
+def ministry_detail(request, pk):
+    ministry = get_object_or_404(Ministry, pk=pk)
+    leaders = ministry.leaders.filter(is_active=True).select_related('community')
+    
+    context = {
+        'ministry': ministry,
+        'leaders': leaders,
+        'title': ministry.name
+    }
+    return render(request, 'ministries/ministry_detail.html', context)
+
+
+@login_required
+def delete_ministry(request, pk):
+    ministry = get_object_or_404(Ministry, pk=pk)
+    
+    if request.method == 'POST':
+        ministry_name = ministry.name
+        ministry.delete()
+        messages.success(request, f'Ministry "{ministry_name}" has been deleted successfully!')
+        return redirect('ministry_list')
+    
+    context = {
+        'ministry': ministry,
+        'title': 'Delete Ministry'
+    }
+    return render(request, 'ministries/ministry_confirm_delete.html', context)
 
 @login_required
 def list_shepherds(request):

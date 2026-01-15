@@ -35,18 +35,18 @@
             <div class="stats-grid">
                 <div class="stat-card income">
                     <div class="stat-label">Total Income</div>
-                    <div class="stat-value positive">${{ total_income|default:"0.00" }}</div>
+                    <div class="stat-value positive">Tsh {{ total_income|default:"0.00" }}</div>
                 </div>
                 
                 <div class="stat-card expense">
                     <div class="stat-label">Total Expenses</div>
-                    <div class="stat-value negative">${{ total_expenses|default:"0.00" }}</div>
+                    <div class="stat-value negative">Tsh {{ total_expenses|default:"0.00" }}</div>
                 </div>
                 
                 <div class="stat-card balance">
                     <div class="stat-label">Balance</div>
                     <div class="stat-value {% if balance >= 0 %}positive{% else %}negative{% endif %}">
-                        ${{ balance|default:"0.00" }}
+                        Tsh {{ balance|default:"0.00" }}
                     </div>
                 </div>
             </div>
@@ -79,7 +79,7 @@
                             </td>
                             <td>
                                 <strong>
-                                    ${{ transaction.amount }}
+                                    Tsh {{ transaction.amount }}
                                 </strong>
                             </td>
                         </tr>

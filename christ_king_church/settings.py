@@ -189,10 +189,10 @@ MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn", "media_root")
 
 # Africa's Talking Configuration (for testing)
 SEND_SMS_ENABLED = True 
-username = os.getenv('AFRICASTALKING_USERNAME')  
-api_key = os.getenv('AFRICASTALKING_API_KEY')
+AFRICASTALKING_USERNAME = os.getenv('AFRICASTALKING_USERNAME')  
+AFRICASTALKING_API_KEY = os.getenv('AFRICASTALKING_API_KEY')
 
-africastalking.initialize(username, api_key)
+africastalking.initialize(AFRICASTALKING_USERNAME, AFRICASTALKING_API_KEY)
 sms = africastalking.SMS
 
 """# Or NextSMS Configuration

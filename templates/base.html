@@ -1687,13 +1687,13 @@
                   </div>
                 </div>
                 <div class="submenu" id="ministries-submenu" {% if ministries_active_add or ministries_active_list%} style="max-height: 500px;" {% endif %} >
-                  <a href="{% url 'add_ministry' %}" class="submenu-link {% if ministries_active_add %}active{% endif %}">
+                  <a href="{% url 'create_ministry' %}" class="submenu-link {% if ministries_active_add %}active{% endif %}">
                     <div class="submenu-icon">
                       <i class="fas fa-plus"></i>
                     </div>
                     <div class="submenu-text">Add Ministry</div>
                   </a>
-                  <a href="{% url 'list_ministries' %}" class="submenu-link {% if ministries_active_list %}active{% endif %}" >
+                  <a href="{% url 'ministry_list' %}" class="submenu-link {% if ministries_active_list %}active{% endif %}" >
                     <div class="submenu-icon">
                       <i class="fas fa-list"></i>
                     </div>

@@ -1,6 +1,6 @@
 from django import forms
-
-from .models import Member, Ministry, CommunityLeader,Committee
+from django.forms import inlineformset_factory
+from .models import Member, Ministry, CommunityLeader,Committee,MinistryLeader
 
 
 class MemberForm(forms.ModelForm):
@@ -40,25 +40,67 @@ class MemberForm(forms.ModelForm):
 class MinistryForm(forms.ModelForm):
     class Meta:
         model = Ministry
-        fields = ['name', 'description', 'feast_name', 'feast_date', 'leader', 'position', 'phone']
-        
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Make description field optional since it's null=True, blank=True in model
-        self.fields['name'].required = False
-        self.fields['description'].required = False
-        self.fields['feast_name'].required = False
-        self.fields['feast_date'].required = False
-        self.fields['leader'].required = False
-        self.fields['position'].required = False
-        self.fields['phone'].required = False
-        
-    def clean_name(self):
-        name = self.cleaned_data.get('name')
-        if Ministry.objects.filter(name=name).exists():
-            if not self.instance or self.instance.name != name:
-                raise forms.ValidationError("A ministry with this name already exists.")
-        return name
+        fields = ['name', 'feast_name', 'feast_date']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter ministry name'
+            }),
+            'feast_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter feast name'
+            }),
+            'feast_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+        }
+
+
+class MinistryLeaderForm(forms.ModelForm):
+    class Meta:
+        model = MinistryLeader
+        fields = ['leader_name', 'position', 'community', 'phone', 'email', 'appointed_date']
+        widgets = {
+            'leader_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter leader name'
+            }),
+            'position': forms.Select(attrs={'class': 'form-control'}),
+            'community': forms.Select(attrs={
+                'class': 'form-control',
+                'placeholder': 'Select community'
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '+255XXXXXXXXX'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'leader@example.com'
+            }),
+            'appointed_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+        }
+        labels = {
+            'community': 'Community *',
+            'leader_name': 'Leader Name *',
+            'position': 'Position *',
+        }
+
+
+# Formset for multiple leaders
+MinistryLeaderFormSet = inlineformset_factory(
+    Ministry,
+    MinistryLeader,
+    form=MinistryLeaderForm,
+    extra=3,  # Number of empty forms to display
+    can_delete=True,
+    min_num=1,  # Minimum number of leaders required
+    validate_min=True
+)
     
 class CommiteeForm(forms.ModelForm):
     class Meta:

@@ -1,3 +1,4 @@
+from django.utils import timezone
 from enum import member
 import os, random
 from django.conf import settings
@@ -20,25 +21,49 @@ def upload_image_path(instance, filename):
 
 
 class Ministry(models.Model):
-    rank = [
-        ('CHAIR PERSON','chair person'),
-        ('VICE CHAIR','vice chair'),
-        ('SECRETARY','secretary'),
-        ('VICE SECRETARY','vice secretary'),
-        ('ACCOUNTANT', 'accountant'),
-        ('COORDINATOR','coordinator')
-    ]
     name = models.CharField(max_length=255)
-    description = models.ForeignKey("Community", verbose_name="Community", on_delete=models.CASCADE, related_name="Community_member", null=True, blank=True)
-    feast_name = models.TextField(max_length='10',blank=True, null=True )
+    feast_name = models.TextField(max_length=10, blank=True, null=True)
     feast_date = models.DateField(blank=True, null=True)
-    #leader = models.OneToOneField("Member", on_delete=models.CASCADE,related_name='leader', blank=True, null=True)
-    leader = models.CharField(max_length=250, null=True, blank=True)
-    position = models.CharField(max_length=30,choices=rank,null=True, blank=True, default='Member')
-    phone = PhoneNumberField(max_length=255, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.name}"
+    
+    class Meta:
+        verbose_name_plural = "Ministries"
+
+
+class MinistryLeader(models.Model):
+    RANK_CHOICES = [
+        ('CHAIR PERSON', 'Chair Person'),
+        ('VICE CHAIR', 'Vice Chair'),
+        ('SECRETARY', 'Secretary'),
+        ('VICE SECRETARY', 'Vice Secretary'),
+        ('ACCOUNTANT', 'Accountant'),
+        ('COORDINATOR', 'Coordinator')
+    ]
+    
+    ministry = models.ForeignKey(Ministry, on_delete=models.CASCADE, 
+                                related_name='leaders')
+    leader_name = models.CharField(max_length=250)
+    position = models.CharField(max_length=30, choices=RANK_CHOICES)
+    community = models.ForeignKey("Community", verbose_name="Community", 
+                                 on_delete=models.CASCADE, 
+                                 related_name="ministry_leaders", 
+                                 null=True, blank=True)
+    phone = PhoneNumberField(max_length=255, null=True, blank=True)
+    email = models.EmailField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    appointed_date = models.DateField(null=True, blank=True)
+    
+    def __str__(self):
+        community_name = self.community.name if self.community else "No Community"
+        return f"{self.leader_name} - {self.position} ({self.ministry.name}) - {community_name}"
+    
+    class Meta:
+        unique_together = ['ministry', 'position']  # One position per ministry
+        ordering = ['ministry', 'position']
 
 class Community(models.Model):
     name = models.CharField(max_length=255, unique=True)

@@ -7,8 +7,8 @@ class AfricasTalkingService:
     """Service class for handling AfricasTalking SMS"""
     
     def __init__(self):
-        self.username = getattr(settings, 'username', '')
-        self.api_key = getattr(settings, 'api_key', '')
+        self.username = getattr(settings, 'AFRICASTALKING_USERNAME', '')  
+        self.api_key = getattr(settings, 'AFRICASTALKING_API_KEY', '') 
         
         if self.username and self.api_key:
             africastalking.initialize(self.username, self.api_key)

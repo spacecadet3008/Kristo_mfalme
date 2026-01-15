@@ -12,14 +12,15 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
 from dotenv import load_dotenv,find_dotenv
 import africastalking
 import dj_database_url
 from django.contrib import messages
 
 load_dotenv(find_dotenv())  
-print(f"DEBUG: Username is |{os.getenv('AFRICASTALKING_USERNAME')}|")
-print(f"DEBUG: API Key is |{os.getenv('AFRICASTALKING_API_KEY')}|")
+"""print(f"DEBUG: Username is |{os.getenv('AFRICASTALKING_USERNAME')}|")
+print(f"DEBUG: API Key is |{os.getenv('AFRICASTALKING_API_KEY')}|")"""
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,18 +33,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 
-"""ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '.onrender.com',  # Allow all Render subdomains 
-]
-"""
+ALLOWED_HOSTS = config('ALLOWED_HOST',default=''.split(',') )
+ # Allow all Render subdomains 
+
+
 
 # Application definition
 
@@ -106,21 +105,19 @@ WSGI_APPLICATION = 'christ_king_church.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
+"""DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-}
+}"""
 
-"""DATABASES = {
+DATABASES = {
     'default': dj_database_url.config(
-        default='sqlite:///db.sqlite3',
-        conn_max_age=600,
-        conn_health_checks=True,
+        default=config('DATABASE_URL',default='sqlite:///db.sqlite3')
     )
 }
-"""
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

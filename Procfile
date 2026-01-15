@@ -1,1 +1,1 @@
-web:python manage.py migrate && python manage.py collectstatic --noinput && gunicorn christ_king_church.wsgi
+web: gunicorn christ_king_church.wsgi

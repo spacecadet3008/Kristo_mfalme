@@ -72,7 +72,8 @@ INSTALLED_APPS = [
     'tithe',
     'notifications',
     'rest_framework',
-    'finance'
+    'finance',
+    'catechesis'
 ]
 
 LOGIN_URL = 'login_user'  
@@ -118,28 +119,14 @@ WSGI_APPLICATION = 'christ_king_church.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-"""DATABASES = {
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-}"""
-
-
-DATABASES = {
-    'default': dj_database_url.config(
-        default=dj_database_url.config('DATABASE_URL',default='sqlite:///db.sqlite3')
-    )
 }
 
-POSTGRES_LOCALLY = os.environ.get('POSTGRES_LOCALLY','FALSE').lower() == 'true'
 
-if POSTGRES_LOCALLY:
-    DATABASE_URL=os.getenv('DATABASE_URL')
-    if DATABASE_URL:
-        DATABASES['default'] = dj_database_url.parse(DATABASE_URL)
-    else:
-        print("error database postgress is True, but DATABASE url variable is not set")
 
 
 # Password validation

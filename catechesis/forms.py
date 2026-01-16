@@ -1,9 +1,9 @@
 from django import forms
-from .models import Member, SacramentRequest, Sacrament
+from .models import SacramentRequest, Sacrament,CatechesisMember
 
 class MemberRegistrationForm(forms.ModelForm):
     class Meta:
-        model = Member
+        model = CatechesisMember
         fields = ['first_name', 'last_name', 'date_of_birth', 'email', 
                   'phone', 'address', 'birth_certificate']
         widgets = {

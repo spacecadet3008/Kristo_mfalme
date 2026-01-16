@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q
 from django.utils import timezone
-from .models import CatechesisMember, Sacrament, SacramentRequest, CustomUser
+from .models import CatechesisMember, Sacrament, SacramentRequest
 from .forms import MemberRegistrationForm, SacramentRequestForm, ReviewForm
 
 def is_approver(user):
@@ -20,7 +20,8 @@ def member_register(request):
     else:
         form = MemberRegistrationForm()
     
-    return render(request, 'catechesis/member_register.html', {'form': form})
+    return render(request, 'catechesis/member_register.html', {'form': form, 'catechesis_active':True,
+        'catechesis_register_active':True})
 
 
 def member_list(request):
@@ -36,9 +37,10 @@ def member_list(request):
     
     return render(request, 'catechesis/member_list.html', {
         'members': members,
-        'query': query
+        'query': query,
+        'catechesis_active': True,
+        'catechesis_member_list': True  #
     })
-
 
 def member_detail(request, pk):
     member = get_object_or_404(CatechesisMember, pk=pk)
@@ -46,7 +48,9 @@ def member_detail(request, pk):
     
     return render(request, 'catechesis/member_detail.html', {
         'member': member,
-        'sacrament_requests': sacrament_requests
+        'sacrament_requests': sacrament_requests,
+        'catechesis_active':True,
+        'catechesis_member_detail':True
     })
 
 
@@ -78,7 +82,9 @@ def sacrament_request_create(request, member_pk):
     return render(request, 'catechesis/sacrament_request.html', {
         'form': form,
         'member': member,
-        'available_sacraments': available_sacraments
+        'available_sacraments': available_sacraments,
+        'catechesis_active':True,
+        'catechesis_sacrament_request_create':True
     })
 
 
@@ -95,7 +101,9 @@ def pending_requests(request):
     
     return render(request, 'catechesis/pending_requests.html', {
         'requests': requests,
-        'status_filter': status_filter
+        'status_filter': status_filter,
+        'catechesis_active':True,
+        'catechesis_pending_request':True
     })
 
 
@@ -132,8 +140,8 @@ def review_request(request, pk):
         form = ReviewForm()
     
     return render(request, 'catechesis/review_request.html', {
-        'sacrament_request': sacrament_request,
-        'form': form
+        'sacrament_request': sacrament_request,'catechesis_active':True, 'catechesis_review_guest':True,
+        'form': form, 'review':sacrament_request
     })
 
 
@@ -159,5 +167,7 @@ def complete_request(request, pk):
 def sacrament_list(request):
     sacraments = Sacrament.objects.all()
     return render(request, 'catechesis/sacrament_list.html', {
-        'sacraments': sacraments
+        'sacraments': sacraments,
+        'catechesis_active': True,  
+        'catechesis_sacrament_list': True
     })

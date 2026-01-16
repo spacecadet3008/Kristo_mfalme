@@ -31,10 +31,10 @@ class ManagerUser(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         
-        if not email and not username:
+        if  not username:
             raise ValueError("Superuser must have an email address or username")
         
-        return self.create_user(email=email, username=username, password=password, **extra_fields)
+        return self.create_user(username=username, password=password, **extra_fields)
     
     def create_user_as_admin(self, admin_user, email=None, username=None, password= None, **extra_fields):
         """only allows adm/super to create users"""

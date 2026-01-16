@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-from decouple import config
+#from decouple import config
 from dotenv import load_dotenv,find_dotenv
 import africastalking
 import dj_database_url
@@ -32,15 +32,28 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.railway.app',
+]
+
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = True
+"""DEBUG = config('DEBUG', default=False, cast=bool)"""
 
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 
-ALLOWED_HOSTS = config('ALLOWED_HOST',default=''.split(',') )
- # Allow all Render subdomains 
+
+"""ALLOWED_HOSTS = config('ALLOWED_HOST',default=''.split(',') )
+ # Allow all Render subdomains """
+
+ALLOWED_HOSTS = [
+    'calm-connection-production.up.railway.app',  # Your Railway domain
+    'localhost',
+    '127.0.0.1',
+]
 
 
 
@@ -112,11 +125,21 @@ WSGI_APPLICATION = 'christ_king_church.wsgi.application'
     }
 }"""
 
+
 DATABASES = {
     'default': dj_database_url.config(
-        default=config('DATABASE_URL',default='sqlite:///db.sqlite3')
+        default=dj_database_url.config('DATABASE_URL',default='sqlite:///db.sqlite3')
     )
 }
+
+POSTGRES_LOCALLY = os.environ.get('POSTGRES_LOCALLY','FALSE').lower() == 'true'
+
+if POSTGRES_LOCALLY:
+    DATABASE_URL=os.getenv('DATABASE_URL')
+    if DATABASE_URL:
+        DATABASES['default'] = dj_database_url.parse(DATABASE_URL)
+    else:
+        print("error database postgress is True, but DATABASE url variable is not set")
 
 
 # Password validation
